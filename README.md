@@ -491,6 +491,44 @@ taal/
 └── taal.schema.json       # JSON Schema for IDE support
 ```
 
+## Publishing
+
+TAAL uses automated NPM publishing via GitHub Actions.
+
+### Release Process
+
+1. **Update version** in `package.json`:
+   ```bash
+   npm version patch  # 1.0.0 -> 1.0.1
+   npm version minor  # 1.0.0 -> 1.1.0
+   npm version major  # 1.0.0 -> 2.0.0
+   ```
+
+2. **Commit and push**:
+   ```bash
+   git add package.json
+   git commit -m "chore: bump version to v1.0.1"
+   git push origin main
+   ```
+
+3. **Create and push tag**:
+   ```bash
+   git tag v1.0.1
+   git push origin v1.0.1
+   ```
+
+4. **GitHub Actions automatically**:
+   - Runs tests
+   - Runs linter
+   - Publishes to NPM with provenance
+
+### Prerequisites
+
+Repository maintainers must configure:
+- `NPM_TOKEN` secret in GitHub repository settings
+- NPM account with 2FA enabled
+- Package access permissions
+
 ## Contributing
 
 Contributions welcome! Please:
@@ -499,7 +537,8 @@ Contributions welcome! Please:
 2. Create a feature branch
 3. Write tests for new functionality
 4. Ensure all tests pass: `bun test`
-5. Submit a pull request
+5. Ensure linter passes: `bun x ultracite check`
+6. Submit a pull request
 
 ### Adding a new provider
 

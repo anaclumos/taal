@@ -3,6 +3,7 @@ import { Command } from 'commander';
 import { init } from './commands/init';
 import { collect } from './commands/collect';
 import { validate } from './commands/validate';
+import { diff } from './commands/diff';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { writeFile, readFile, exists } from 'node:fs/promises';
@@ -92,6 +93,54 @@ program
         }
         process.exit(1);
       }
+    } catch (error) {
+      console.error('Error:', error instanceof Error ? error.message : error);
+      process.exit(1);
+    }
+  });
+
+program
+  .command('diff [provider]')
+  .description('Show what would change without writing')
+  .action(async (provider?: string) => {
+    try {
+      const result = await diff(undefined, provider);
+      
+      if (result.error) {
+        console.error(chalk.red(`Error: ${result.error}`));
+        process.exit(1);
+      }
+      
+      if (!result.hasChanges) {
+        console.log(chalk.green('\n✓ No changes detected'));
+        process.exit(0);
+      }
+      
+      console.log(chalk.bold('\nChanges:\n'));
+      
+      const byProvider = new Map<string, typeof result.changes>();
+      for (const change of result.changes) {
+        if (!byProvider.has(change.provider)) {
+          byProvider.set(change.provider, []);
+        }
+        byProvider.get(change.provider)!.push(change);
+      }
+      
+      for (const [providerName, changes] of byProvider) {
+        console.log(chalk.bold(`${providerName}:`));
+        for (const change of changes) {
+          if (change.type === 'add') {
+            console.log(chalk.green(`  + ${change.serverName}`));
+          } else if (change.type === 'remove') {
+            console.log(chalk.red(`  - ${change.serverName}`));
+          } else {
+            console.log(chalk.yellow(`  ~ ${change.serverName}`));
+          }
+        }
+        console.log();
+      }
+      
+      process.exit(1);
     } catch (error) {
       console.error('Error:', error instanceof Error ? error.message : error);
       process.exit(1);

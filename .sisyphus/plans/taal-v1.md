@@ -374,7 +374,7 @@ Each implementation task follows RED-GREEN-REFACTOR:
 
 ---
 
-- [ ] 3b. Cursor Provider
+- [x] 3b. Cursor Provider
 
   **What to do**:
   - Implement Cursor provider
@@ -401,7 +401,7 @@ Each implementation task follows RED-GREEN-REFACTOR:
 
 ---
 
-- [ ] 3c. Continue.dev Provider
+- [x] 3c. Continue.dev Provider
 
   **What to do**:
   - Implement Continue provider
@@ -443,7 +443,7 @@ Each implementation task follows RED-GREEN-REFACTOR:
 
 ---
 
-- [ ] 3d. Zed Provider
+- [x] 3d. Zed Provider
 
   **What to do**:
   - Implement Zed provider
@@ -487,7 +487,7 @@ Each implementation task follows RED-GREEN-REFACTOR:
 
 ---
 
-- [ ] 3e. OpenCode Provider
+- [x] 3e. OpenCode Provider
 
   **What to do**:
   - Implement OpenCode provider
@@ -538,7 +538,7 @@ Each implementation task follows RED-GREEN-REFACTOR:
 
 ---
 
-- [ ] 3f. Codex Provider
+- [x] 3f. Codex Provider
 
   **What to do**:
   - Implement Codex provider
@@ -584,7 +584,7 @@ Each implementation task follows RED-GREEN-REFACTOR:
 
 ---
 
-- [ ] 3g. Windsurf Provider
+- [x] 3g. Windsurf Provider
 
   **What to do**:
   - Implement Windsurf provider
@@ -611,7 +611,7 @@ Each implementation task follows RED-GREEN-REFACTOR:
 
 ---
 
-- [ ] 3h. Antigravity Provider
+- [x] 3h. Antigravity Provider
 
   **What to do**:
   - Implement Antigravity provider

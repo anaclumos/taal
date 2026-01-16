@@ -1,7 +1,5 @@
 # TAAL - Tooling & Agent Abstraction Layer
 
-> A CLI tool to sync MCP server configurations and Agent Skills across multiple AI coding assistants.
-
 TAAL provides a single source of truth for your MCP (Model Context Protocol) server configurations and Agent Skills, automatically syncing them across all your AI coding tools.
 
 ## Quick Start

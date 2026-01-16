@@ -5,6 +5,7 @@ import { collect } from './commands/collect';
 import { validate } from './commands/validate';
 import { diff } from './commands/diff';
 import { sync } from './commands/sync';
+import { list } from './commands/list';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { writeFile, readFile, exists } from 'node:fs/promises';
@@ -176,6 +177,54 @@ program
       }
       
       process.exit(result.success ? 0 : 1);
+    } catch (error) {
+      console.error('Error:', error instanceof Error ? error.message : error);
+      process.exit(1);
+    }
+  });
+
+program
+  .command('list')
+  .description('List configured MCP servers and skills')
+  .action(async () => {
+    try {
+      const result = await list();
+      
+      if (result.error) {
+        console.error(chalk.red(`Error: ${result.error}`));
+        process.exit(1);
+      }
+      
+      console.log(chalk.bold('\nMCP Servers:\n'));
+      if (result.servers.length === 0) {
+        console.log(chalk.dim('  No servers configured'));
+      } else {
+        for (const server of result.servers) {
+          const type = server.type === 'stdio' ? chalk.blue('[stdio]') : chalk.green('[http]');
+          const detail = server.command || server.url || '';
+          console.log(`  ${type} ${chalk.bold(server.name)} ${chalk.dim(detail)}`);
+        }
+      }
+      
+      console.log(chalk.bold('\nSkills:\n'));
+      if (result.skills.length === 0) {
+        console.log(chalk.dim('  No skills found'));
+      } else {
+        for (const skill of result.skills) {
+          console.log(`  • ${chalk.bold(skill.name)} ${chalk.dim(skill.path)}`);
+        }
+      }
+      
+      console.log(chalk.bold('\nEnabled Providers:\n'));
+      if (result.enabledProviders.length === 0) {
+        console.log(chalk.dim('  No providers enabled'));
+      } else {
+        for (const provider of result.enabledProviders) {
+          console.log(`  • ${provider}`);
+        }
+      }
+      
+      console.log();
     } catch (error) {
       console.error('Error:', error instanceof Error ? error.message : error);
       process.exit(1);

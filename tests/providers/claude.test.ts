@@ -250,6 +250,7 @@ describe("ClaudeCodeProvider", () => {
 
     expect(result).toEqual({
       filesystem: {
+        type: "stdio",
         command: "npx",
         args: ["-y", "@modelcontextprotocol/server-filesystem", "/tmp"],
         env: { LOG_LEVEL: "debug" },
@@ -257,7 +258,26 @@ describe("ClaudeCodeProvider", () => {
     });
   });
 
-  it("should skip HTTP servers with warning", () => {
+  it("should transform HTTP servers correctly", () => {
+    const servers: Record<string, McpServer> = {
+      "http-server": {
+        url: "https://example.com/mcp",
+        headers: { Authorization: "Bearer token" },
+      },
+    };
+
+    const result = provider.transformMcpServers(servers);
+
+    expect(result).toEqual({
+      "http-server": {
+        type: "http",
+        url: "https://example.com/mcp",
+        headers: { Authorization: "Bearer token" },
+      },
+    });
+  });
+
+  it("should handle both stdio and HTTP servers", () => {
     const servers: Record<string, McpServer> = {
       "stdio-server": {
         command: "npx",
@@ -273,11 +293,33 @@ describe("ClaudeCodeProvider", () => {
 
     expect(result).toEqual({
       "stdio-server": {
+        type: "stdio",
         command: "npx",
         args: ["-y", "package"],
       },
+      "http-server": {
+        type: "http",
+        url: "https://example.com/mcp",
+        headers: { Authorization: "Bearer token" },
+      },
     });
-    expect(Object.keys(result)).not.toContain("http-server");
+  });
+
+  it("should handle HTTP servers without headers", () => {
+    const servers: Record<string, McpServer> = {
+      "simple-http": {
+        url: "https://api.example.com/mcp",
+      },
+    };
+
+    const result = provider.transformMcpServers(servers);
+
+    expect(result).toEqual({
+      "simple-http": {
+        type: "http",
+        url: "https://api.example.com/mcp",
+      },
+    });
   });
 
   it("should read config from file", async () => {

@@ -226,9 +226,15 @@ TAAL supports 9 AI coding assistants:
 
 ### Provider-Specific Notes
 
-**Claude Desktop & Claude Code**
+**Claude Desktop**
 - Only supports stdio servers (no HTTP)
-- Shared skills directory: `~/.claude/skills/`
+- Skills directory: `~/.claude/skills/`
+
+**Claude Code**
+- Supports both stdio and HTTP servers (SSE deprecated)
+- Uses `type: "http" | "stdio"` format in config
+- Skills directory: `~/.claude/skills/`
+- Can import servers from Claude Desktop via `claude mcp add-from-claude-desktop`
 
 **Cursor**
 - Only supports stdio servers

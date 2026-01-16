@@ -1,6 +1,7 @@
 import { exists, mkdir, writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
+import { collect } from "./collect.js";
 
 const SAMPLE_CONFIG = `# TAAL Configuration
 # https://github.com/user/taal
@@ -42,10 +43,16 @@ export interface InitOptions {
   force?: boolean;
 }
 
+export interface InitResult {
+  configPath: string;
+  collected: boolean;
+  serversFound: number;
+}
+
 export async function init(
   baseDir?: string,
   options: InitOptions = {}
-): Promise<void> {
+): Promise<InitResult> {
   const taalDir = join(baseDir || homedir(), ".taal");
   const configPath = join(taalDir, "config.yaml");
   const skillsDir = join(taalDir, "skills");
@@ -63,4 +70,13 @@ export async function init(
 
   // Write sample config
   await writeFile(configPath, SAMPLE_CONFIG, "utf-8");
+
+  // Automatically collect existing MCP configs from installed providers
+  const collectResult = await collect(baseDir);
+
+  return {
+    configPath,
+    collected: collectResult.summary.totalServers > 0,
+    serversFound: collectResult.summary.totalServers,
+  };
 }

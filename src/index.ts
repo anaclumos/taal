@@ -28,10 +28,23 @@ program
   .option("-f, --force", "Overwrite existing configuration")
   .action(async (options) => {
     try {
-      await init(homedir(), options);
+      const result = await init(homedir(), options);
       console.log("✓ TAAL initialized successfully");
-      console.log(`  Config: ${homedir()}/.taal/config.yaml`);
+      console.log(`  Config: ${result.configPath}`);
       console.log(`  Skills: ${homedir()}/.taal/skills/`);
+
+      if (result.collected && result.serversFound > 0) {
+        console.log(
+          `\n✓ Collected ${result.serversFound} MCP server(s) from installed providers`
+        );
+        console.log(
+          "\nRun 'taal sync' to sync these servers to all enabled providers."
+        );
+      } else {
+        console.log(
+          "\nNo existing MCP servers found. Edit ~/.taal/config.yaml to add servers."
+        );
+      }
     } catch (error) {
       console.error("Error:", error instanceof Error ? error.message : error);
       process.exit(1);
@@ -47,8 +60,12 @@ program
       const result = await collect();
 
       console.log(
-        `\n✓ Found ${result.summary.totalServers} servers from ${result.summary.providersWithConfigs} providers`
+        `\n✓ Found ${result.summary.totalServers} server(s) from ${result.summary.providersWithConfigs} provider(s)`
       );
+
+      if (result.skillsCollected > 0) {
+        console.log(`✓ Collected ${result.skillsCollected} skill(s)`);
+      }
 
       if (result.conflicts.length > 0) {
         console.log("\n⚠ Conflicts detected:");

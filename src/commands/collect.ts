@@ -1,6 +1,10 @@
+import { existsSync } from "node:fs";
 import { homedir } from "node:os";
+import { join } from "node:path";
 import type { McpServer } from "../config/schema.js";
 import { initializeProviders, registry } from "../providers/index.js";
+import { copySkillsToProvider } from "../skills/copy.js";
+import { discoverSkills } from "../skills/discovery.js";
 
 export interface CollectConflict {
   serverName: string;
@@ -11,6 +15,7 @@ export interface CollectConflict {
 export interface CollectResult {
   servers: Record<string, McpServer>;
   conflicts: CollectConflict[];
+  skillsCollected: number;
   summary: {
     totalServers: number;
     providersScanned: number;
@@ -103,9 +108,45 @@ export async function collect(baseDir?: string): Promise<CollectResult> {
     }
   }
 
+  // Collect skills from providers
+  const taalSkillsDir = join(home, ".taal", "skills");
+  let skillsCollected = 0;
+
+  for (const provider of allProviders) {
+    if (!provider.skillsPath) {
+      continue;
+    }
+
+    try {
+      const isInstalled = await provider.isInstalled(home);
+      if (!isInstalled) {
+        continue;
+      }
+
+      const skillsPath =
+        typeof provider.skillsPath === "function"
+          ? provider.skillsPath(home)
+          : provider.skillsPath;
+
+      if (existsSync(skillsPath)) {
+        const providerSkills = discoverSkills([skillsPath], home);
+        if (providerSkills.length > 0) {
+          await copySkillsToProvider(providerSkills, taalSkillsDir);
+          skillsCollected += providerSkills.length;
+        }
+      }
+    } catch (error) {
+      console.warn(
+        `Warning: Failed to collect skills from ${provider.name}:`,
+        error
+      );
+    }
+  }
+
   return {
     servers,
     conflicts,
+    skillsCollected,
     summary: {
       totalServers: Object.keys(servers).length,
       providersScanned,

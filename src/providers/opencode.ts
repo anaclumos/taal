@@ -8,7 +8,7 @@ export class OpenCodeProvider extends BaseProvider {
     join(home, ".config", "opencode", "opencode.json");
   format = "json" as const;
   mcpKey = "mcp";
-  skillsPath = (home: string) => join(home, ".opencode", "skills");
+  skillsPath = (home: string) => join(home, ".config", "opencode", "skill");
 
   transformMcpServers(
     servers: Record<string, McpServer>

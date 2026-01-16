@@ -1,13 +1,14 @@
 import { existsSync, readFileSync } from "node:fs";
 import type { JsonMap } from "@iarna/toml";
 import { parse as parseToml, stringify as stringifyToml } from "@iarna/toml";
+import { parse as parseJsonc } from "jsonc-parser";
 import { parse as parseYaml, stringify as stringifyYaml } from "yaml";
 import { atomicWrite } from "../utils/atomic-write.js";
 import { backupConfig } from "../utils/backup.js";
 import type { ConfigFormat } from "./types.js";
 
 /**
- * Read and parse a JSON config file
+ * Read and parse a JSON config file (supports JSONC - JSON with Comments)
  */
 export function readJsonConfig(path: string): unknown {
   if (!existsSync(path)) {
@@ -16,7 +17,8 @@ export function readJsonConfig(path: string): unknown {
 
   try {
     const content = readFileSync(path, "utf-8");
-    return JSON.parse(content);
+    // Use JSONC parser to support comments and trailing commas (used by Zed, VS Code, etc.)
+    return parseJsonc(content);
   } catch (error) {
     throw new Error(`Failed to read JSON config at ${path}: ${error}`);
   }

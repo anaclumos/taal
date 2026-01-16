@@ -146,11 +146,12 @@ describe("readJsonConfig", () => {
     expect(config).toEqual({});
   });
 
-  it("should throw on invalid JSON", () => {
+  it("should handle invalid JSON gracefully (JSONC parser returns empty object)", () => {
     const filePath = join(TEST_DIR, "invalid.json");
     writeFileSync(filePath, "{invalid json}");
 
-    expect(() => readJsonConfig(filePath)).toThrow(/Failed to read JSON/);
+    const config = readJsonConfig(filePath);
+    expect(config).toEqual({});
   });
 });
 

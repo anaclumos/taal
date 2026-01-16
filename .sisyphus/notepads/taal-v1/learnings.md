@@ -283,3 +283,71 @@ tests/skills/
 - Task 5a-5g: Implement CLI commands (init, collect, sync, etc.)
 - Consider adding skill metadata caching
 - May add skill version validation in future
+
+---
+
+## [2026-01-17T01:25] Task 3a: Claude Provider (Desktop + Code)
+
+### Successful Patterns
+
+1. **Provider Class Implementation**
+   - Implement Provider interface from types.ts
+   - Use class syntax for clean encapsulation
+   - Metadata as class properties (name, format, mcpKey, etc.)
+   - Async methods for I/O operations
+
+2. **Path Resolution Strategy**
+   - Use function for configPath: `(home: string) => string`
+   - Allows dynamic path construction per user
+   - Claude Desktop: `~/Library/Application Support/Claude/claude_desktop_config.json`
+   - Claude Code: `~/.claude/settings.json`
+   - Shared skills path: `~/.claude/skills/`
+
+3. **Server Transformation Logic**
+   - Filter out HTTP servers (Claude only supports stdio)
+   - Warn on skipped servers (don't fail silently)
+   - Only include fields that exist (use spread with conditionals)
+   - Pattern: `...(server.args && { args: server.args })`
+
+4. **Installation Detection**
+   - Check if config directory exists (not file)
+   - Use `dirname()` to get parent directory
+   - More reliable than checking for config file
+
+5. **Code Reuse Between Providers**
+   - Claude Desktop and Claude Code share almost identical logic
+   - Only difference: config path
+   - Could extract base class in future, but duplication is minimal
+
+### Technical Decisions
+
+1. **Stdio Only**: Claude doesn't support HTTP servers, skip with warning
+2. **Shared Skills Path**: Both Desktop and Code use `~/.claude/skills/`
+3. **JSON Format**: Both use JSON with `mcpServers` key
+4. **Optional Fields**: Only include args/env if present (cleaner output)
+5. **Class-Based**: Use classes for providers (vs plain objects)
+
+### Gotchas Encountered
+
+None - implementation was straightforward following the Provider interface.
+
+### Files Created
+```
+src/providers/
+├── claude-desktop.ts  # Claude Desktop provider
+└── claude-code.ts     # Claude Code provider
+
+tests/providers/
+└── claude.test.ts     # 16 tests for both providers
+```
+
+### Metrics
+- **Lines of Code**: ~120 (src) + ~280 (tests)
+- **Test Coverage**: 16 tests, 24 assertions
+- **Test Execution Time**: ~164ms
+- **Type Errors**: 0
+
+### Next Steps
+- Task 3b-3h: Implement remaining providers (Cursor, Continue, Zed, etc.)
+- All provider implementations can be parallelized
+- Consider extracting base provider class if duplication increases

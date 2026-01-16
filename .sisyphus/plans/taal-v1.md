@@ -154,7 +154,7 @@ Each implementation task follows RED-GREEN-REFACTOR:
 
 ### Phase 1: Foundation
 
-- [ ] 0. Project Setup
+- [x] 0. Project Setup
 
   **What to do**:
   - Initialize Bun project with `bun init`
@@ -205,7 +205,7 @@ Each implementation task follows RED-GREEN-REFACTOR:
 
 ---
 
-- [ ] 1. Config Schema & Parser
+- [x] 1. Config Schema & Parser
 
   **What to do**:
   - Define Zod schema for `~/.taal/config.yaml`

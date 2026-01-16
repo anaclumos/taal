@@ -7,7 +7,7 @@ const SAMPLE_CONFIG = `# TAAL Configuration
 
 version: "1"
 
-mcp:
+mcp: {}
   # Example stdio server
   # example-server:
   #   command: npx

@@ -204,3 +204,82 @@ tests/providers/
 - Task 3a-3h: Implement specific providers (Claude, Cursor, etc.)
 - Add YAML/TOML write support when needed
 - Consider adding retry logic for atomic writes
+
+---
+
+## [2026-01-17T01:20] Task 4: Skills Handler
+
+### Successful Patterns
+
+1. **Skills Discovery**
+   - Recursive directory scanning with graceful error handling
+   - Skip non-directories and files in skills root
+   - Validate each skill before including in results
+   - Support multiple skill paths from config
+   - Warn on invalid skills but continue processing
+
+2. **YAML Frontmatter Validation**
+   - Check for `---` delimiters at start and end
+   - Parse YAML between delimiters
+   - Validate required `name` field (string type)
+   - Allow additional fields in frontmatter
+   - Clear error messages for each validation failure
+
+3. **Skills Copy Strategy**
+   - Use `cpSync` with recursive option for entire skill directory
+   - Preserve all files and subdirectories (scripts, references, etc.)
+   - Overwrite by default (configurable via options)
+   - Create target directory if missing
+   - Continue on individual skill copy failures
+
+4. **Skill Structure**
+   - Export `Skill` interface with name, path, skillMdPath
+   - Separate concerns: discovery, validation, copying
+   - Validator returns structured result (valid, error, name)
+   - Copy functions accept skill objects, not raw paths
+
+### Technical Decisions
+
+1. **Frontmatter Format**: YAML between `---` delimiters (Agent Skills spec)
+2. **Required Field**: Only `name` is required (minimal validation)
+3. **Copy Behavior**: Overwrite by default (sync semantics)
+4. **Error Handling**: Warn and continue (don't fail entire operation)
+5. **Directory Structure**: Preserve exact structure including subdirectories
+
+### Gotchas Encountered
+
+1. **Empty YAML Frontmatter**: Empty content between `---` parses as `null`, not object
+   - Fix: Check for null/non-object and provide appropriate error
+   - Lesson: YAML parser behavior differs from JSON for empty content
+
+2. **Frontmatter Delimiter Detection**: Need to find `\n---\n` not just `---`
+   - Pattern: `content.indexOf('\n---\n', 4)` to skip opening delimiter
+   - Ensures proper closing delimiter detection
+
+3. **Console Output in Tests**: Skills copy logs to console during tests
+   - Expected behavior: Informational logging
+   - Could be suppressed in tests if needed
+
+### Files Created
+```
+src/skills/
+├── discovery.ts       # Discover skills from paths
+├── validator.ts       # Validate SKILL.md format
+└── copy.ts            # Copy skills to provider
+
+tests/skills/
+├── discovery.test.ts  # 10 discovery tests
+├── validator.test.ts  # 12 validation tests
+└── copy.test.ts       # 9 copy tests
+```
+
+### Metrics
+- **Lines of Code**: ~200 (src) + ~450 (tests)
+- **Test Coverage**: 28 tests, 55 assertions
+- **Test Execution Time**: ~64ms
+- **Type Errors**: 0
+
+### Next Steps
+- Task 5a-5g: Implement CLI commands (init, collect, sync, etc.)
+- Consider adding skill metadata caching
+- May add skill version validation in future

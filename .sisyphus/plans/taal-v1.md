@@ -639,7 +639,7 @@ Each implementation task follows RED-GREEN-REFACTOR:
 
 ### Phase 3: Skills & CLI
 
-- [ ] 4. Skills Handler
+- [x] 4. Skills Handler
 
   **What to do**:
   - Implement skills discovery from `~/.taal/skills/`

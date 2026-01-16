@@ -8,7 +8,7 @@ TAAL provides a single source of truth for your MCP (Model Context Protocol) ser
 
 ```bash
 # Install globally
-npm install -g taal
+npm install -g @anaclumos/taal
 
 # Initialize TAAL
 taal init
@@ -24,19 +24,19 @@ taal sync
 ### Via npm (recommended)
 
 ```bash
-npm install -g taal
+npm install -g @anaclumos/taal
 ```
 
 ### Via bunx
 
 ```bash
-bunx taal --help
+bunx @anaclumos/taal --help
 ```
 
 ### From source
 
 ```bash
-git clone https://github.com/user/taal.git
+git clone https://github.com/anaclumos/taal.git
 cd taal
 bun install
 bun run src/index.ts --help
@@ -554,10 +554,11 @@ MIT
 
 ## Links
 
+- [NPM Package](https://www.npmjs.com/package/@anaclumos/taal)
+- [GitHub Repository](https://github.com/anaclumos/taal)
+- [Issue Tracker](https://github.com/anaclumos/taal/issues)
 - [MCP Specification](https://modelcontextprotocol.io)
 - [Agent Skills Specification](https://agentskills.io)
-- [GitHub Repository](https://github.com/user/taal)
-- [Issue Tracker](https://github.com/user/taal/issues)
 
 ## Acknowledgments
 

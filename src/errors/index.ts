@@ -1,3 +1,5 @@
+import { isError } from "es-toolkit/predicate";
+
 export class TaalError extends Error {
   readonly code: string;
 
@@ -36,7 +38,7 @@ export class ValidationError extends TaalError {
 }
 
 export function formatError(error: unknown): string {
-  if (error instanceof Error) {
+  if (isError(error)) {
     return error.message;
   }
   return String(error);

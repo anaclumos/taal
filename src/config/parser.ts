@@ -1,4 +1,5 @@
 import { readFileSync } from "node:fs";
+import { isError } from "es-toolkit/predicate";
 import { parse } from "yaml";
 import { substituteEnvVars } from "./env.js";
 import { type TaalConfig, TaalConfigSchema } from "./schema.js";
@@ -16,7 +17,9 @@ export function loadConfig(path: string): TaalConfig {
   try {
     fileContent = readFileSync(path, "utf-8");
   } catch (error) {
-    throw new Error(`Failed to read config file at ${path}: ${error}`);
+    throw new Error(
+      `Failed to read config file at ${path}: ${isError(error) ? error.message : String(error)}`
+    );
   }
 
   // 2. Parse YAML
@@ -24,7 +27,9 @@ export function loadConfig(path: string): TaalConfig {
   try {
     rawConfig = parse(fileContent);
   } catch (error) {
-    throw new Error(`Failed to parse YAML in ${path}: ${error}`);
+    throw new Error(
+      `Failed to parse YAML in ${path}: ${isError(error) ? error.message : String(error)}`
+    );
   }
 
   // 3. Substitute environment variables

@@ -1,5 +1,6 @@
 import { homedir } from "node:os";
 import { join } from "node:path";
+import { mapValues } from "es-toolkit/object";
 import { stringify as stringifyYaml } from "yaml";
 import type { McpServer } from "../config/schema.js";
 import { atomicWrite } from "../utils/atomic-write.js";
@@ -53,10 +54,8 @@ export class ContinueProvider extends BaseProvider {
   private transformEnvVars(
     obj: Record<string, string>
   ): Record<string, string> {
-    const transformed: Record<string, string> = {};
-    for (const [key, value] of Object.entries(obj)) {
-      transformed[key] = value.replace(/\$\{([^}]+)\}/g, "${{ secrets.$1 }}");
-    }
-    return transformed;
+    return mapValues(obj, (value) =>
+      value.replace(/\$\{([^}]+)\}/g, "${{ secrets.$1 }}")
+    );
   }
 }

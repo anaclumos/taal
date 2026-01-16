@@ -4,6 +4,7 @@ import { homedir } from "node:os";
 import { join } from "node:path";
 import chalk from "chalk";
 import { Command } from "commander";
+import { isError } from "es-toolkit/predicate";
 import YAML from "yaml";
 import { collect } from "./commands/collect";
 import { diff } from "./commands/diff";
@@ -46,7 +47,7 @@ program
         );
       }
     } catch (error) {
-      console.error("Error:", error instanceof Error ? error.message : error);
+      console.error("Error:", isError(error) ? error.message : error);
       process.exit(1);
     }
   });
@@ -101,7 +102,7 @@ program
       await writeFile(configPath, YAML.stringify(existingConfig), "utf-8");
       console.log(`\n✓ Updated config: ${configPath}`);
     } catch (error) {
-      console.error("Error:", error instanceof Error ? error.message : error);
+      console.error("Error:", isError(error) ? error.message : error);
       process.exit(1);
     }
   });
@@ -132,7 +133,7 @@ program
         process.exit(1);
       }
     } catch (error) {
-      console.error("Error:", error instanceof Error ? error.message : error);
+      console.error("Error:", isError(error) ? error.message : error);
       process.exit(1);
     }
   });
@@ -180,7 +181,7 @@ program
 
       process.exit(1);
     } catch (error) {
-      console.error("Error:", error instanceof Error ? error.message : error);
+      console.error("Error:", isError(error) ? error.message : error);
       process.exit(1);
     }
   });
@@ -218,7 +219,7 @@ program
 
       process.exit(result.success ? 0 : 1);
     } catch (error) {
-      console.error("Error:", error instanceof Error ? error.message : error);
+      console.error("Error:", isError(error) ? error.message : error);
       process.exit(1);
     }
   });
@@ -271,7 +272,7 @@ program
 
       console.log();
     } catch (error) {
-      console.error("Error:", error instanceof Error ? error.message : error);
+      console.error("Error:", isError(error) ? error.message : error);
       process.exit(1);
     }
   });
@@ -310,7 +311,7 @@ program
 
       console.log();
     } catch (error) {
-      console.error("Error:", error instanceof Error ? error.message : error);
+      console.error("Error:", isError(error) ? error.message : error);
       process.exit(1);
     }
   });

@@ -1,6 +1,7 @@
 import { exists, readFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
+import { isError } from "es-toolkit/predicate";
 import { parse } from "yaml";
 import { findEnvVarReferences, substituteEnvVars } from "./env.js";
 import { type TaalConfig, TaalConfigSchema } from "./schema.js";
@@ -35,7 +36,7 @@ export async function loadTaalConfig(
     return {
       config: null,
       errors: [
-        `Failed to read config: ${error instanceof Error ? error.message : error}`,
+        `Failed to read config: ${isError(error) ? error.message : String(error)}`,
       ],
       warnings: [],
     };
@@ -48,7 +49,7 @@ export async function loadTaalConfig(
     return {
       config: null,
       errors: [
-        `Failed to parse YAML: ${error instanceof Error ? error.message : error}`,
+        `Failed to parse YAML: ${isError(error) ? error.message : String(error)}`,
       ],
       warnings,
     };

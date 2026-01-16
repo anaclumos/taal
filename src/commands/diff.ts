@@ -1,5 +1,6 @@
 import { homedir } from "node:os";
 import { isEqual } from "es-toolkit";
+import { isError } from "es-toolkit/predicate";
 import { loadTaalConfig } from "../config/loader.js";
 import { initializeProviders, registry } from "../providers/index.js";
 
@@ -122,7 +123,7 @@ export async function diff(
     return {
       hasChanges: false,
       changes: [],
-      error: error instanceof Error ? error.message : String(error),
+      error: isError(error) ? error.message : String(error),
     };
   }
 }

@@ -1,4 +1,6 @@
 import { homedir } from "node:os";
+import { compact } from "es-toolkit/array";
+import { isError } from "es-toolkit/predicate";
 import { loadTaalConfig } from "../config/loader.js";
 import { discoverSkills } from "../skills/discovery.js";
 
@@ -37,22 +39,17 @@ export async function list(baseDir?: string): Promise<ListResult> {
   const config = result.config;
 
   try {
-    const servers: ServerInfo[] = [];
-    for (const [name, server] of Object.entries(config.mcp || {})) {
-      if (server.url) {
-        servers.push({
-          name,
-          type: "http",
-          url: server.url,
-        });
-      } else if (server.command) {
-        servers.push({
-          name,
-          type: "stdio",
-          command: server.command,
-        });
-      }
-    }
+    const servers = compact(
+      Object.entries(config.mcp || {}).map(([name, server]) => {
+        if (server.url) {
+          return { name, type: "http" as const, url: server.url };
+        }
+        if (server.command) {
+          return { name, type: "stdio" as const, command: server.command };
+        }
+        return undefined;
+      })
+    );
 
     const skillPaths = config.skills?.paths || [];
     const discoveredSkills = await discoverSkills(skillPaths, home);
@@ -74,7 +71,7 @@ export async function list(baseDir?: string): Promise<ListResult> {
       servers: [],
       skills: [],
       enabledProviders: [],
-      error: error instanceof Error ? error.message : String(error),
+      error: isError(error) ? error.message : String(error),
     };
   }
 }

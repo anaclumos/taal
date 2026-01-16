@@ -1,4 +1,5 @@
 import { homedir } from "node:os";
+import { isError } from "es-toolkit/predicate";
 import { loadTaalConfig } from "../config/loader.js";
 import { initializeProviders, registry } from "../providers/index.js";
 import { copySkillsToProvider } from "../skills/copy.js";
@@ -90,7 +91,7 @@ export async function sync(
       } catch (error) {
         failed.push({
           provider: provider.name,
-          error: error instanceof Error ? error.message : String(error),
+          error: isError(error) ? error.message : String(error),
         });
       }
     }
@@ -105,7 +106,7 @@ export async function sync(
       success: false,
       synced: [],
       failed: [],
-      error: error instanceof Error ? error.message : String(error),
+      error: isError(error) ? error.message : String(error),
     };
   }
 }

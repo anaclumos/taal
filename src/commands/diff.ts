@@ -1,20 +1,7 @@
 import { homedir } from "node:os";
+import { isEqual } from "es-toolkit";
 import { loadTaalConfig } from "../config/loader.js";
 import { initializeProviders, registry } from "../providers/index.js";
-
-function sortObjectKeys(obj: unknown): unknown {
-  if (obj === null || typeof obj !== "object") {
-    return obj;
-  }
-  if (Array.isArray(obj)) {
-    return obj.map(sortObjectKeys);
-  }
-  const sorted: Record<string, unknown> = {};
-  for (const key of Object.keys(obj).sort()) {
-    sorted[key] = sortObjectKeys((obj as Record<string, unknown>)[key]);
-  }
-  return sorted;
-}
 
 export interface DiffChange {
   type: "add" | "remove" | "modify";
@@ -87,16 +74,12 @@ export async function diff(
 
         for (const key of taalKeys) {
           if (currentKeys.has(key)) {
-            const currentValue = JSON.stringify(
-              sortObjectKeys(currentServers[key])
-            );
-            const newValue = JSON.stringify(
-              sortObjectKeys(
-                (transformedServers as Record<string, unknown>)[key]
-              )
-            );
+            const currentValue = currentServers[key];
+            const newValue = (transformedServers as Record<string, unknown>)[
+              key
+            ];
 
-            if (currentValue !== newValue) {
+            if (!isEqual(currentValue, newValue)) {
               changes.push({
                 type: "modify",
                 serverName: key,

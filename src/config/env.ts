@@ -1,7 +1,9 @@
+import { isPlainObject, isString } from "es-toolkit";
+
 export function findEnvVarReferences(value: unknown): string[] {
   const refs = new Set<string>();
 
-  if (typeof value === "string") {
+  if (isString(value)) {
     const matches = value.matchAll(/\$\{([^}]+)\}/g);
     for (const match of matches) {
       refs.add(match[1]);
@@ -12,7 +14,7 @@ export function findEnvVarReferences(value: unknown): string[] {
         refs.add(ref);
       }
     }
-  } else if (value && typeof value === "object") {
+  } else if (isPlainObject(value)) {
     for (const v of Object.values(value)) {
       for (const ref of findEnvVarReferences(v)) {
         refs.add(ref);
@@ -24,7 +26,7 @@ export function findEnvVarReferences(value: unknown): string[] {
 }
 
 export function substituteEnvVars(value: unknown): unknown {
-  if (typeof value === "string") {
+  if (isString(value)) {
     return value.replace(/\$\{([^}]+)\}/g, (match, varName) => {
       const envValue = process.env[varName];
       if (envValue === undefined) {
@@ -39,7 +41,7 @@ export function substituteEnvVars(value: unknown): unknown {
     return value.map(substituteEnvVars);
   }
 
-  if (value && typeof value === "object") {
+  if (isPlainObject(value)) {
     return Object.fromEntries(
       Object.entries(value).map(([k, v]) => [k, substituteEnvVars(v)])
     );

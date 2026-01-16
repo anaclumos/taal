@@ -1,5 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { isPlainObject, isString } from "es-toolkit";
 import { parse as parseYaml } from "yaml";
 
 interface SkillFrontmatter {
@@ -72,7 +73,7 @@ export function validateSkill(skillPath: string): ValidationResult {
     };
   }
 
-  if (!parsed || typeof parsed !== "object") {
+  if (!isPlainObject(parsed)) {
     return {
       valid: false,
       error: "Frontmatter must be a YAML object",
@@ -81,7 +82,7 @@ export function validateSkill(skillPath: string): ValidationResult {
 
   const frontmatter = parsed as SkillFrontmatter;
 
-  if (!frontmatter.name || typeof frontmatter.name !== "string") {
+  if (!(frontmatter.name && isString(frontmatter.name))) {
     return {
       valid: false,
       error: 'Frontmatter must contain a "name" field (string)',

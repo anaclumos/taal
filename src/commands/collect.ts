@@ -1,6 +1,7 @@
 import { existsSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
+import { isEqual, isPlainObject, isString, uniqWith } from "es-toolkit";
 import type { McpServer } from "../config/schema.js";
 import { initializeProviders, registry } from "../providers/index.js";
 import { copySkillsToProvider } from "../skills/copy.js";
@@ -95,10 +96,12 @@ export async function collect(baseDir?: string): Promise<CollectResult> {
   for (const [serverName, sources] of serverSources.entries()) {
     if (sources.length > 1) {
       // Check if configs are actually different
-      const configStrings = sources.map((s) => JSON.stringify(s.config));
-      const uniqueConfigs = new Set(configStrings);
+      const uniqueConfigs = uniqWith(
+        sources.map((s) => s.config),
+        isEqual
+      );
 
-      if (uniqueConfigs.size > 1) {
+      if (uniqueConfigs.length > 1) {
         conflicts.push({
           serverName,
           providers: sources.map((s) => s.provider),
@@ -159,14 +162,14 @@ export async function collect(baseDir?: string): Promise<CollectResult> {
  * Convert provider-specific server config to TAAL format
  */
 function convertToTaalFormat(config: unknown): McpServer | null {
-  if (!config || typeof config !== "object") {
+  if (!isPlainObject(config)) {
     return null;
   }
 
   const obj = config as Record<string, unknown>;
 
   // HTTP server
-  if (obj.url && typeof obj.url === "string") {
+  if (obj.url && isString(obj.url)) {
     return {
       url: obj.url,
       headers:
@@ -176,7 +179,7 @@ function convertToTaalFormat(config: unknown): McpServer | null {
   }
 
   // Stdio server
-  if (obj.command && typeof obj.command === "string") {
+  if (obj.command && isString(obj.command)) {
     const server: McpServer = {
       command: obj.command,
     };
@@ -185,9 +188,9 @@ function convertToTaalFormat(config: unknown): McpServer | null {
       server.args = obj.args as string[];
     }
 
-    if (obj.env && typeof obj.env === "object") {
+    if (obj.env && isPlainObject(obj.env)) {
       server.env = obj.env as Record<string, string>;
-    } else if (obj.environment && typeof obj.environment === "object") {
+    } else if (obj.environment && isPlainObject(obj.environment)) {
       server.env = obj.environment as Record<string, string>;
     }
 
@@ -202,7 +205,7 @@ function convertToTaalFormat(config: unknown): McpServer | null {
       args,
     };
 
-    if (obj.environment && typeof obj.environment === "object") {
+    if (obj.environment && isPlainObject(obj.environment)) {
       server.env = obj.environment as Record<string, string>;
     }
 

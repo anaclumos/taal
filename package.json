@@ -1,5 +1,5 @@
 {
-  "name": "taal",
+  "name": "@anaclumos/taal",
   "version": "1.0.0",
   "description": "CLI tool to sync MCP server configs and Agent Skills across AI coding assistants",
   "type": "module",
@@ -21,16 +21,16 @@
     "sync",
     "config"
   ],
-  "author": "",
+  "author": "Sunghyun Cho <anaclumos@gmail.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/user/taal.git"
+    "url": "https://github.com/anaclumos/taal.git"
   },
   "bugs": {
-    "url": "https://github.com/user/taal/issues"
+    "url": "https://github.com/anaclumos/taal/issues"
   },
-  "homepage": "https://github.com/user/taal#readme",
+  "homepage": "https://github.com/anaclumos/taal#readme",
   "engines": {
     "node": ">=18.0.0"
   },

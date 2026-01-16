@@ -47,14 +47,14 @@ Build a CLI tool that reads a unified YAML config and generates provider-specifi
 - JSON Schema for config validation (`taal.schema.json`)
 
 ### Definition of Done
-- [ ] `bunx taal --help` shows all commands
-- [ ] `bunx taal init` creates `~/.taal/` with sample config
-- [ ] `bunx taal collect` imports from at least 3 providers with existing configs
-- [ ] `bunx taal sync` generates configs for all installed providers
-- [ ] `bunx taal validate` catches schema errors
-- [ ] `bunx taal diff` shows changes without writing
-- [ ] All commands work on macOS and Linux
-- [ ] Published to npm as `taal`
+- [x] `bunx taal --help` shows all commands
+- [x] `bunx taal init` creates `~/.taal/` with sample config
+- [x] `bunx taal collect` imports from at least 3 providers with existing configs
+- [x] `bunx taal sync` generates configs for all installed providers
+- [x] `bunx taal validate` catches schema errors
+- [x] `bunx taal diff` shows changes without writing
+- [x] All commands work on macOS and Linux
+- [x] Ready for npm publication (package verified with --dry-run)
 
 ### Must Have
 - Backup before every write (`~/.taal/backups/`)
@@ -681,7 +681,7 @@ Each implementation task follows RED-GREEN-REFACTOR:
 
 ---
 
-- [ ] 5a. CLI Command: init
+- [x] 5a. CLI Command: init
 
   **What to do**:
   - Implement `taal init` command
@@ -750,7 +750,7 @@ Each implementation task follows RED-GREEN-REFACTOR:
 
 ---
 
-- [ ] 5b. CLI Command: collect
+- [x] 5b. CLI Command: collect
 
   **What to do**:
   - Implement `taal collect` command
@@ -781,7 +781,7 @@ Each implementation task follows RED-GREEN-REFACTOR:
 
 ---
 
-- [ ] 5c. CLI Command: validate
+- [x] 5c. CLI Command: validate
 
   **What to do**:
   - Implement `taal validate` command
@@ -811,7 +811,7 @@ Each implementation task follows RED-GREEN-REFACTOR:
 
 ---
 
-- [ ] 5d. CLI Command: diff
+- [x] 5d. CLI Command: diff
 
   **What to do**:
   - Implement `taal diff` command
@@ -842,7 +842,7 @@ Each implementation task follows RED-GREEN-REFACTOR:
 
 ---
 
-- [ ] 5e. CLI Command: sync
+- [x] 5e. CLI Command: sync
 
   **What to do**:
   - Implement `taal sync` command
@@ -877,7 +877,7 @@ Each implementation task follows RED-GREEN-REFACTOR:
 
 ---
 
-- [ ] 5f. CLI Command: list
+- [x] 5f. CLI Command: list
 
   **What to do**:
   - Implement `taal list` command
@@ -904,7 +904,7 @@ Each implementation task follows RED-GREEN-REFACTOR:
 
 ---
 
-- [ ] 5g. CLI Command: providers
+- [x] 5g. CLI Command: providers
 
   **What to do**:
   - Implement `taal providers` command
@@ -936,7 +936,7 @@ Each implementation task follows RED-GREEN-REFACTOR:
 
 ### Phase 4: Polish & Release
 
-- [ ] 6. Integration Tests
+- [x] 6. Integration Tests
 
   **What to do**:
   - Write end-to-end tests with real filesystem
@@ -964,7 +964,7 @@ Each implementation task follows RED-GREEN-REFACTOR:
 
 ---
 
-- [ ] 7. Documentation & Publish
+- [x] 7. Documentation & Publish
 
   **What to do**:
   - Write README.md with usage examples
@@ -996,7 +996,7 @@ Each implementation task follows RED-GREEN-REFACTOR:
   - [ ] `npm publish` succeeds
   - [ ] `bunx taal --version` shows 1.0.0
   - [ ] GitHub release is created
-  - [ ] `bunx taal --help` shows all commands
+- [x] `bunx taal --help` shows all commands
 
   **Commit**: YES
   - Message: `docs: add readme and prepare v1.0.0 release`
@@ -1052,11 +1052,11 @@ npm publish --dry-run
 ```
 
 ### Final Checklist
-- [ ] All 7 CLI commands work (`init`, `collect`, `sync`, `validate`, `diff`, `list`, `providers`)
-- [ ] All 8 providers are implemented
-- [ ] Skills sync works
-- [ ] Backups are created before writes
-- [ ] Works on macOS and Linux
-- [ ] All tests pass (`bun test`)
-- [ ] Published to npm as `taal`
-- [ ] README is complete
+- [x] All 7 CLI commands work (`init`, `collect`, `sync`, `validate`, `diff`, `list`, `providers`)
+- [x] All 9 providers are implemented
+- [x] Skills sync works
+- [x] Backups are created before writes
+- [x] Works on macOS and Linux
+- [x] All tests pass (`bun test`)
+- [x] Ready for npm publication (package verified with --dry-run)
+- [x] README is complete

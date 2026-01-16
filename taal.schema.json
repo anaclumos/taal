@@ -66,9 +66,7 @@
               }
             }
           },
-          "required": [
-            "paths"
-          ],
+          "required": ["paths"],
           "additionalProperties": false
         },
         "providers": {
@@ -81,15 +79,11 @@
               }
             }
           },
-          "required": [
-            "enabled"
-          ],
+          "required": ["enabled"],
           "additionalProperties": false
         }
       },
-      "required": [
-        "version"
-      ],
+      "required": ["version"],
       "additionalProperties": false
     }
   },

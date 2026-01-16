@@ -1,9 +1,9 @@
-import { readFileSync, existsSync } from 'fs';
-import { parse as parseYaml } from 'yaml';
-import { parse as parseToml } from '@iarna/toml';
-import type { ConfigFormat } from './types.js';
-import { atomicWrite } from '../utils/atomic-write.js';
-import { backupConfig } from '../utils/backup.js';
+import { existsSync, readFileSync } from "node:fs";
+import { parse as parseToml } from "@iarna/toml";
+import { parse as parseYaml } from "yaml";
+import { atomicWrite } from "../utils/atomic-write.js";
+import { backupConfig } from "../utils/backup.js";
+import type { ConfigFormat } from "./types.js";
 
 /**
  * Read and parse a JSON config file
@@ -12,9 +12,9 @@ export function readJsonConfig(path: string): unknown {
   if (!existsSync(path)) {
     return {};
   }
-  
+
   try {
-    const content = readFileSync(path, 'utf-8');
+    const content = readFileSync(path, "utf-8");
     return JSON.parse(content);
   } catch (error) {
     throw new Error(`Failed to read JSON config at ${path}: ${error}`);
@@ -28,9 +28,9 @@ export function readYamlConfig(path: string): unknown {
   if (!existsSync(path)) {
     return {};
   }
-  
+
   try {
-    const content = readFileSync(path, 'utf-8');
+    const content = readFileSync(path, "utf-8");
     return parseYaml(content);
   } catch (error) {
     throw new Error(`Failed to read YAML config at ${path}: ${error}`);
@@ -44,9 +44,9 @@ export function readTomlConfig(path: string): unknown {
   if (!existsSync(path)) {
     return {};
   }
-  
+
   try {
-    const content = readFileSync(path, 'utf-8');
+    const content = readFileSync(path, "utf-8");
     return parseToml(content);
   } catch (error) {
     throw new Error(`Failed to read TOML config at ${path}: ${error}`);
@@ -58,11 +58,11 @@ export function readTomlConfig(path: string): unknown {
  */
 export function readConfig(path: string, format: ConfigFormat): unknown {
   switch (format) {
-    case 'json':
+    case "json":
       return readJsonConfig(path);
-    case 'yaml':
+    case "yaml":
       return readYamlConfig(path);
-    case 'toml':
+    case "toml":
       return readTomlConfig(path);
     default:
       throw new Error(`Unsupported config format: ${format}`);
@@ -79,23 +79,23 @@ export function writeConfig(
 ): void {
   // Create backup if file exists
   backupConfig(path);
-  
+
   // Serialize based on format
   let content: string;
   switch (format) {
-    case 'json':
+    case "json":
       content = JSON.stringify(config, null, 2);
       break;
-    case 'yaml':
+    case "yaml":
       // Note: YAML stringify will be implemented when needed
-      throw new Error('YAML write not yet implemented');
-    case 'toml':
+      throw new Error("YAML write not yet implemented");
+    case "toml":
       // Note: TOML stringify will be implemented when needed
-      throw new Error('TOML write not yet implemented');
+      throw new Error("TOML write not yet implemented");
     default:
       throw new Error(`Unsupported config format: ${format}`);
   }
-  
+
   // Atomic write
   atomicWrite(path, content);
 }
@@ -107,5 +107,5 @@ export function resolveConfigPath(
   configPath: string | ((home: string) => string),
   home: string
 ): string {
-  return typeof configPath === 'function' ? configPath(home) : configPath;
+  return typeof configPath === "function" ? configPath(home) : configPath;
 }

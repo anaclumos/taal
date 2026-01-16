@@ -1,6 +1,6 @@
-import { mkdir, writeFile, exists } from 'node:fs/promises';
-import { join } from 'node:path';
-import { homedir } from 'node:os';
+import { exists, mkdir, writeFile } from "node:fs/promises";
+import { homedir } from "node:os";
+import { join } from "node:path";
 
 const SAMPLE_CONFIG = `# TAAL Configuration
 # https://github.com/user/taal
@@ -42,15 +42,18 @@ export interface InitOptions {
   force?: boolean;
 }
 
-export async function init(baseDir?: string, options: InitOptions = {}): Promise<void> {
-  const taalDir = join(baseDir || homedir(), '.taal');
-  const configPath = join(taalDir, 'config.yaml');
-  const skillsDir = join(taalDir, 'skills');
-  const backupsDir = join(taalDir, 'backups');
+export async function init(
+  baseDir?: string,
+  options: InitOptions = {}
+): Promise<void> {
+  const taalDir = join(baseDir || homedir(), ".taal");
+  const configPath = join(taalDir, "config.yaml");
+  const skillsDir = join(taalDir, "skills");
+  const backupsDir = join(taalDir, "backups");
 
   // Check if already initialized
-  if (await exists(configPath) && !options.force) {
-    throw new Error('TAAL is already initialized. Use --force to overwrite.');
+  if ((await exists(configPath)) && !options.force) {
+    throw new Error("TAAL is already initialized. Use --force to overwrite.");
   }
 
   // Create directories
@@ -59,5 +62,5 @@ export async function init(baseDir?: string, options: InitOptions = {}): Promise
   await mkdir(backupsDir, { recursive: true });
 
   // Write sample config
-  await writeFile(configPath, SAMPLE_CONFIG, 'utf-8');
+  await writeFile(configPath, SAMPLE_CONFIG, "utf-8");
 }

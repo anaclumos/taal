@@ -1,34 +1,40 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 /**
  * MCP Server Schema
  * Supports either stdio (command-based) OR HTTP (url-based) servers, not both
  */
-export const McpServerSchema = z.object({
-  // Stdio server fields
-  command: z.string().optional(),
-  args: z.array(z.string()).optional(),
-  env: z.record(z.string()).optional(),
-  
-  // HTTP server fields
-  url: z.string().optional(),
-  headers: z.record(z.string()).optional(),
-  
-  // Provider-specific overrides
-  overrides: z.record(z.object({
-    enabled_tools: z.array(z.string()).optional(),
-  })).optional(),
-}).refine(
-  (data) => {
-    const hasStdio = !!data.command;
-    const hasHttp = !!data.url;
-    // Must be either stdio OR http, not both, not neither
-    return (hasStdio && !hasHttp) || (hasHttp && !hasStdio);
-  },
-  {
-    message: "Server must be either stdio (command) or http (url), not both",
-  }
-);
+export const McpServerSchema = z
+  .object({
+    // Stdio server fields
+    command: z.string().optional(),
+    args: z.array(z.string()).optional(),
+    env: z.record(z.string()).optional(),
+
+    // HTTP server fields
+    url: z.string().optional(),
+    headers: z.record(z.string()).optional(),
+
+    // Provider-specific overrides
+    overrides: z
+      .record(
+        z.object({
+          enabled_tools: z.array(z.string()).optional(),
+        })
+      )
+      .optional(),
+  })
+  .refine(
+    (data) => {
+      const hasStdio = !!data.command;
+      const hasHttp = !!data.url;
+      // Must be either stdio OR http, not both, not neither
+      return (hasStdio && !hasHttp) || (hasHttp && !hasStdio);
+    },
+    {
+      message: "Server must be either stdio (command) or http (url), not both",
+    }
+  );
 
 /**
  * Skills Configuration Schema

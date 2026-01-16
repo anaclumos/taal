@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, expect, test } from "bun:test";
 import { mkdir, rm, writeFile } from "node:fs/promises";
-import { tmpdir } from "node:os";
+import { platform, tmpdir } from "node:os";
 import { join } from "node:path";
 import { collect } from "../../src/commands/collect";
 
@@ -41,13 +41,11 @@ test("collect imports from Claude Desktop", async () => {
 });
 
 test("collect imports from Cursor", async () => {
-  const cursorDir = join(
-    testDir,
-    "Library",
-    "Application Support",
-    "Cursor",
-    "User"
-  );
+  const os = platform();
+  const cursorDir =
+    os === "darwin"
+      ? join(testDir, "Library", "Application Support", "Cursor", "User")
+      : join(testDir, ".config", "Cursor", "User");
   await mkdir(cursorDir, { recursive: true });
 
   const cursorConfig = {
@@ -70,6 +68,8 @@ test("collect imports from Cursor", async () => {
 });
 
 test("collect merges servers from multiple providers", async () => {
+  const os = platform();
+
   // Claude
   const claudeDir = join(testDir, "Library", "Application Support", "Claude");
   await mkdir(claudeDir, { recursive: true });
@@ -83,13 +83,10 @@ test("collect merges servers from multiple providers", async () => {
   );
 
   // Cursor
-  const cursorDir = join(
-    testDir,
-    "Library",
-    "Application Support",
-    "Cursor",
-    "User"
-  );
+  const cursorDir =
+    os === "darwin"
+      ? join(testDir, "Library", "Application Support", "Cursor", "User")
+      : join(testDir, ".config", "Cursor", "User");
   await mkdir(cursorDir, { recursive: true });
   await writeFile(
     join(cursorDir, "settings.json"),
@@ -107,6 +104,8 @@ test("collect merges servers from multiple providers", async () => {
 });
 
 test("collect warns on duplicate server names with different configs", async () => {
+  const os = platform();
+
   const claudeDir = join(testDir, "Library", "Application Support", "Claude");
   await mkdir(claudeDir, { recursive: true });
   await writeFile(
@@ -118,13 +117,10 @@ test("collect warns on duplicate server names with different configs", async () 
     })
   );
 
-  const cursorDir = join(
-    testDir,
-    "Library",
-    "Application Support",
-    "Cursor",
-    "User"
-  );
+  const cursorDir =
+    os === "darwin"
+      ? join(testDir, "Library", "Application Support", "Cursor", "User")
+      : join(testDir, ".config", "Cursor", "User");
   await mkdir(cursorDir, { recursive: true });
   await writeFile(
     join(cursorDir, "settings.json"),

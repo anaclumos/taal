@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
-import { parse as parseToml } from "@iarna/toml";
-import { parse as parseYaml } from "yaml";
+import type { JsonMap } from "@iarna/toml";
+import { parse as parseToml, stringify as stringifyToml } from "@iarna/toml";
+import { parse as parseYaml, stringify as stringifyYaml } from "yaml";
 import { atomicWrite } from "../utils/atomic-write.js";
 import { backupConfig } from "../utils/backup.js";
 import type { ConfigFormat } from "./types.js";
@@ -69,34 +70,28 @@ export function readConfig(path: string, format: ConfigFormat): unknown {
   }
 }
 
-/**
- * Write config file with backup and atomic write
- */
 export function writeConfig(
   path: string,
   format: ConfigFormat,
   config: unknown
 ): void {
-  // Create backup if file exists
   backupConfig(path);
 
-  // Serialize based on format
   let content: string;
   switch (format) {
     case "json":
       content = JSON.stringify(config, null, 2);
       break;
     case "yaml":
-      // Note: YAML stringify will be implemented when needed
-      throw new Error("YAML write not yet implemented");
+      content = stringifyYaml(config);
+      break;
     case "toml":
-      // Note: TOML stringify will be implemented when needed
-      throw new Error("TOML write not yet implemented");
+      content = stringifyToml(config as JsonMap);
+      break;
     default:
       throw new Error(`Unsupported config format: ${format}`);
   }
 
-  // Atomic write
   atomicWrite(path, content);
 }
 

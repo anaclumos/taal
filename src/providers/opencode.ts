@@ -1,43 +1,14 @@
-import { existsSync } from "node:fs";
-import { homedir } from "node:os";
-import { dirname, join } from "node:path";
+import { join } from "node:path";
 import type { McpServer } from "../config/schema.js";
-import type { Provider } from "./types.js";
-import { readJsonConfig, resolveConfigPath, writeConfig } from "./utils.js";
+import { BaseProvider } from "./base.js";
 
-/**
- * OpenCode Provider
- * Config: opencode.json (project) or ~/.config/opencode/opencode.json (global)
- * Format: JSON with "mcp" key
- * type: "local" | "remote"
- * command is array, uses "environment" not "env"
- * Skills: .opencode/skills/
- */
-export class OpenCodeProvider implements Provider {
+export class OpenCodeProvider extends BaseProvider {
   name = "opencode";
   configPath = (home: string) =>
     join(home, ".config", "opencode", "opencode.json");
   format = "json" as const;
   mcpKey = "mcp";
   skillsPath = (home: string) => join(home, ".opencode", "skills");
-
-  async isInstalled(home?: string): Promise<boolean> {
-    const homeDir = home || homedir();
-    const configDir = dirname(resolveConfigPath(this.configPath, homeDir));
-    return existsSync(configDir);
-  }
-
-  async readConfig(home?: string): Promise<unknown> {
-    const homeDir = home || homedir();
-    const path = resolveConfigPath(this.configPath, homeDir);
-    return readJsonConfig(path);
-  }
-
-  async writeConfig(config: unknown, home?: string): Promise<void> {
-    const homeDir = home || homedir();
-    const path = resolveConfigPath(this.configPath, homeDir);
-    writeConfig(path, this.format, config);
-  }
 
   transformMcpServers(
     servers: Record<string, McpServer>
@@ -69,7 +40,3 @@ export class OpenCodeProvider implements Provider {
     return transformed;
   }
 }
-
-import { registry } from "./registry.js";
-
-registry.register(new OpenCodeProvider());

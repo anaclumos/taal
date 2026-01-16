@@ -1,9 +1,45 @@
 import type { McpServer } from "../config/schema.js";
 
-/**
- * Configuration format supported by providers
- */
 export type ConfigFormat = "json" | "yaml" | "toml";
+
+export interface StdioServerConfig {
+  command: string;
+  args?: string[];
+  env?: Record<string, string>;
+}
+
+export interface HttpServerConfig {
+  url: string;
+  headers?: Record<string, string>;
+}
+
+export interface OpenCodeServerConfig {
+  type: "local" | "remote";
+  command?: string[];
+  url?: string;
+  environment?: Record<string, string>;
+  headers?: Record<string, string>;
+  enabled: boolean;
+}
+
+export interface CodexServerConfig {
+  command?: string;
+  args?: string[];
+  env?: Record<string, string>;
+  url?: string;
+  http_headers?: Record<string, string>;
+  enabled: boolean;
+  startup_timeout_sec?: number;
+  enabled_tools?: string[];
+}
+
+export interface WindsurfHttpServerConfig extends HttpServerConfig {
+  transport: "streamable-http";
+}
+
+export interface ProviderConfig {
+  [key: string]: unknown;
+}
 
 /**
  * Provider interface - defines how to interact with each AI coding assistant

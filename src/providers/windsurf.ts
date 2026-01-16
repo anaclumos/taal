@@ -1,17 +1,9 @@
-import { existsSync } from "node:fs";
-import { homedir, platform } from "node:os";
-import { dirname, join } from "node:path";
+import { platform } from "node:os";
+import { join } from "node:path";
 import type { McpServer } from "../config/schema.js";
-import type { Provider } from "./types.js";
-import { readJsonConfig, resolveConfigPath, writeConfig } from "./utils.js";
+import { BaseProvider } from "./base.js";
 
-/**
- * Windsurf Provider
- * Config: Similar to Cursor/VSCode
- * Format: JSON with "mcpServers" key
- * Supports: stdio and streamable-http
- */
-export class WindsurfProvider implements Provider {
+export class WindsurfProvider extends BaseProvider {
   name = "windsurf";
   configPath = (home: string) => {
     const os = platform();
@@ -29,24 +21,6 @@ export class WindsurfProvider implements Provider {
   };
   format = "json" as const;
   mcpKey = "mcpServers";
-
-  async isInstalled(home?: string): Promise<boolean> {
-    const homeDir = home || homedir();
-    const configDir = dirname(resolveConfigPath(this.configPath, homeDir));
-    return existsSync(configDir);
-  }
-
-  async readConfig(home?: string): Promise<unknown> {
-    const homeDir = home || homedir();
-    const path = resolveConfigPath(this.configPath, homeDir);
-    return readJsonConfig(path);
-  }
-
-  async writeConfig(config: unknown, home?: string): Promise<void> {
-    const homeDir = home || homedir();
-    const path = resolveConfigPath(this.configPath, homeDir);
-    writeConfig(path, this.format, config);
-  }
 
   transformMcpServers(
     servers: Record<string, McpServer>
@@ -74,7 +48,3 @@ export class WindsurfProvider implements Provider {
     return transformed;
   }
 }
-
-import { registry } from "./registry.js";
-
-registry.register(new WindsurfProvider());

@@ -238,4 +238,28 @@ name: Complex Skill
     expect(skills).toHaveLength(1);
     expect(skills[0].name).toBe("Complex Skill");
   });
+
+  it("should expand ~ paths using provided baseDir", () => {
+    const fakeHome = TEST_DIR;
+    const skillsDir = join(fakeHome, ".taal", "skills");
+    mkdirSync(skillsDir, { recursive: true });
+
+    const skillDir = join(skillsDir, "tilde-skill");
+    mkdirSync(skillDir);
+    writeFileSync(
+      join(skillDir, "SKILL.md"),
+      `---
+name: Tilde Skill
+---
+
+# Tilde Skill
+`
+    );
+
+    const skills = discoverSkills(["~/.taal/skills"], fakeHome);
+
+    expect(skills).toHaveLength(1);
+    expect(skills[0].name).toBe("Tilde Skill");
+    expect(skills[0].path).toBe(skillDir);
+  });
 });

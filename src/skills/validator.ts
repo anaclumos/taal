@@ -2,9 +2,12 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { parse as parseYaml } from "yaml";
 
-/**
- * Validation result for a skill
- */
+interface SkillFrontmatter {
+  name?: string;
+  description?: string;
+  version?: string;
+}
+
 export interface ValidationResult {
   valid: boolean;
   error?: string;
@@ -59,10 +62,9 @@ export function validateSkill(skillPath: string): ValidationResult {
 
   const frontmatterContent = content.substring(4, frontmatterEnd);
 
-  // Parse YAML frontmatter
-  let frontmatter: any;
+  let parsed: unknown;
   try {
-    frontmatter = parseYaml(frontmatterContent);
+    parsed = parseYaml(frontmatterContent);
   } catch (error) {
     return {
       valid: false,
@@ -70,13 +72,14 @@ export function validateSkill(skillPath: string): ValidationResult {
     };
   }
 
-  // Check for required 'name' field
-  if (!frontmatter || typeof frontmatter !== "object") {
+  if (!parsed || typeof parsed !== "object") {
     return {
       valid: false,
       error: "Frontmatter must be a YAML object",
     };
   }
+
+  const frontmatter = parsed as SkillFrontmatter;
 
   if (!frontmatter.name || typeof frontmatter.name !== "string") {
     return {

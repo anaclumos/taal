@@ -1,23 +1,9 @@
-import { exists, readFile } from "node:fs/promises";
 import { homedir } from "node:os";
-import { join } from "node:path";
-import { parse } from "yaml";
-import { substituteEnvVars } from "../config/env.js";
-import { TaalConfigSchema } from "../config/schema.js";
-import { registry } from "../providers/registry.js";
+import { loadTaalConfig } from "../config/loader.js";
+import { initializeProviders, registry } from "../providers/index.js";
 import { copySkillsToProvider } from "../skills/copy.js";
 import { discoverSkills } from "../skills/discovery.js";
 import { backupConfig } from "../utils/backup.js";
-
-import "../providers/claude-desktop.js";
-import "../providers/claude-code.js";
-import "../providers/cursor.js";
-import "../providers/continue.js";
-import "../providers/zed.js";
-import "../providers/opencode.js";
-import "../providers/codex.js";
-import "../providers/windsurf.js";
-import "../providers/antigravity.js";
 
 export interface SyncResult {
   success: boolean;
@@ -30,34 +16,23 @@ export async function sync(
   baseDir?: string,
   providerName?: string
 ): Promise<SyncResult> {
+  initializeProviders();
   const home = baseDir || homedir();
-  const configPath = join(home, ".taal", "config.yaml");
 
-  if (!(await exists(configPath))) {
+  const result = await loadTaalConfig(baseDir);
+
+  if (!result.config) {
     return {
       success: false,
       synced: [],
       failed: [],
-      error: "Config file not found",
+      error: result.errors[0] || "Config file not found",
     };
   }
 
+  const config = result.config;
+
   try {
-    const content = await readFile(configPath, "utf-8");
-    const rawConfig = parse(content);
-    const configWithEnv = substituteEnvVars(rawConfig);
-    const result = TaalConfigSchema.safeParse(configWithEnv);
-
-    if (!result.success) {
-      return {
-        success: false,
-        synced: [],
-        failed: [],
-        error: "Invalid config",
-      };
-    }
-
-    const config = result.data;
     const synced: string[] = [];
     const failed: Array<{ provider: string; error: string }> = [];
 

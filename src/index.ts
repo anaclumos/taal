@@ -60,7 +60,14 @@ program
       }
 
       const configPath = join(homedir(), ".taal", "config.yaml");
-      let existingConfig: any = {
+      interface TaalConfigFile {
+        version: string;
+        mcp: Record<string, unknown>;
+        skills?: { paths: string[] };
+        providers?: { enabled: string[] };
+      }
+
+      let existingConfig: TaalConfigFile = {
         version: "1",
         mcp: {},
         skills: { paths: ["~/.taal/skills"] },
@@ -69,7 +76,7 @@ program
 
       if (await exists(configPath)) {
         const content = await readFile(configPath, "utf-8");
-        existingConfig = YAML.parse(content);
+        existingConfig = YAML.parse(content) as TaalConfigFile;
       }
 
       existingConfig.mcp = { ...existingConfig.mcp, ...result.servers };
@@ -262,7 +269,7 @@ program
       console.log(chalk.bold("\nSupported Providers:\n"));
 
       for (const provider of result.providers) {
-        const status = [];
+        const status: string[] = [];
 
         if (provider.installed) {
           status.push(chalk.green("installed"));

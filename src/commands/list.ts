@@ -1,9 +1,5 @@
-import { exists, readFile } from "node:fs/promises";
 import { homedir } from "node:os";
-import { join } from "node:path";
-import { parse } from "yaml";
-import { substituteEnvVars } from "../config/env.js";
-import { TaalConfigSchema } from "../config/schema.js";
+import { loadTaalConfig } from "../config/loader.js";
 import { discoverSkills } from "../skills/discovery.js";
 
 export interface ServerInfo {
@@ -27,34 +23,20 @@ export interface ListResult {
 
 export async function list(baseDir?: string): Promise<ListResult> {
   const home = baseDir || homedir();
-  const configPath = join(home, ".taal", "config.yaml");
+  const result = await loadTaalConfig(baseDir);
 
-  if (!(await exists(configPath))) {
+  if (!result.config) {
     return {
       servers: [],
       skills: [],
       enabledProviders: [],
-      error: "Config file not found",
+      error: result.errors[0] || "Config file not found",
     };
   }
 
+  const config = result.config;
+
   try {
-    const content = await readFile(configPath, "utf-8");
-    const rawConfig = parse(content);
-    const configWithEnv = substituteEnvVars(rawConfig);
-    const result = TaalConfigSchema.safeParse(configWithEnv);
-
-    if (!result.success) {
-      return {
-        servers: [],
-        skills: [],
-        enabledProviders: [],
-        error: "Invalid config",
-      };
-    }
-
-    const config = result.data;
-
     const servers: ServerInfo[] = [];
     for (const [name, server] of Object.entries(config.mcp || {})) {
       if (server.url) {

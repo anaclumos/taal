@@ -1,20 +1,6 @@
-import { exists, readFile } from "node:fs/promises";
 import { homedir } from "node:os";
-import { join } from "node:path";
-import { parse } from "yaml";
-import { substituteEnvVars } from "../config/env.js";
-import { TaalConfigSchema } from "../config/schema.js";
-import { registry } from "../providers/registry.js";
-
-import "../providers/claude-desktop.js";
-import "../providers/claude-code.js";
-import "../providers/cursor.js";
-import "../providers/continue.js";
-import "../providers/zed.js";
-import "../providers/opencode.js";
-import "../providers/codex.js";
-import "../providers/windsurf.js";
-import "../providers/antigravity.js";
+import { loadTaalConfig } from "../config/loader.js";
+import { initializeProviders, registry } from "../providers/index.js";
 
 export interface DiffChange {
   type: "add" | "remove" | "modify";
@@ -35,32 +21,22 @@ export async function diff(
   baseDir?: string,
   providerName?: string
 ): Promise<DiffResult> {
+  initializeProviders();
   const home = baseDir || homedir();
-  const configPath = join(home, ".taal", "config.yaml");
 
-  if (!(await exists(configPath))) {
+  const result = await loadTaalConfig(baseDir);
+
+  if (!result.config) {
     return {
       hasChanges: false,
       changes: [],
-      error: "Config file not found",
+      error: result.errors[0] || "Config file not found",
     };
   }
 
+  const config = result.config;
+
   try {
-    const content = await readFile(configPath, "utf-8");
-    const rawConfig = parse(content);
-    const configWithEnv = substituteEnvVars(rawConfig);
-    const result = TaalConfigSchema.safeParse(configWithEnv);
-
-    if (!result.success) {
-      return {
-        hasChanges: false,
-        changes: [],
-        error: "Invalid config",
-      };
-    }
-
-    const config = result.data;
     const changes: DiffChange[] = [];
 
     const providers = providerName

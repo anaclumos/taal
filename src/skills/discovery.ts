@@ -1,4 +1,5 @@
 import { existsSync, readdirSync, statSync } from "node:fs";
+import { homedir } from "node:os";
 import { join } from "node:path";
 import { validateSkill } from "./validator.js";
 
@@ -12,15 +13,31 @@ export interface Skill {
 }
 
 /**
+ * Expand ~ to home directory in a path
+ */
+function expandPath(path: string, home: string): string {
+  if (path.startsWith("~/")) {
+    return join(home, path.slice(2));
+  }
+  if (path === "~") {
+    return home;
+  }
+  return path;
+}
+
+/**
  * Discover all valid skills from given paths
  *
  * @param paths - Array of paths to search for skills
+ * @param baseDir - Optional base directory for ~ expansion (defaults to homedir())
  * @returns Array of discovered skills
  */
-export function discoverSkills(paths: string[]): Skill[] {
+export function discoverSkills(paths: string[], baseDir?: string): Skill[] {
   const skills: Skill[] = [];
+  const home = baseDir || homedir();
 
-  for (const basePath of paths) {
+  for (const rawPath of paths) {
+    const basePath = expandPath(rawPath, home);
     if (!existsSync(basePath)) {
       console.warn(`Skills path does not exist: ${basePath}`);
       continue;

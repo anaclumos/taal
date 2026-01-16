@@ -1,6 +1,6 @@
 {
   "name": "@anaclumos/taal",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "CLI tool to sync MCP server configs and Agent Skills across AI coding assistants",
   "type": "module",
   "bin": {
@@ -22,7 +22,7 @@
     "sync",
     "config"
   ],
-  "author": "Sunghyun Cho <anaclumos@gmail.com>",
+  "author": "Sunghyun Cho <hey@cho.sh>",
   "license": "MIT",
   "repository": {
     "type": "git",

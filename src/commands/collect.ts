@@ -1,17 +1,6 @@
 import { homedir } from "node:os";
 import type { McpServer } from "../config/schema.js";
-import { registry } from "../providers/registry.js";
-
-// Import all providers to register them
-import "../providers/claude-desktop.js";
-import "../providers/claude-code.js";
-import "../providers/cursor.js";
-import "../providers/continue.js";
-import "../providers/zed.js";
-import "../providers/opencode.js";
-import "../providers/codex.js";
-import "../providers/windsurf.js";
-import "../providers/antigravity.js";
+import { initializeProviders, registry } from "../providers/index.js";
 
 export interface CollectConflict {
   serverName: string;
@@ -33,6 +22,7 @@ export interface CollectResult {
  * Collect MCP server configs from all installed providers
  */
 export async function collect(baseDir?: string): Promise<CollectResult> {
+  initializeProviders();
   const home = baseDir || homedir();
   const servers: Record<string, McpServer> = {};
   const conflicts: CollectConflict[] = [];

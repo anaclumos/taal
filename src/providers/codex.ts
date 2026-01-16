@@ -1,47 +1,27 @@
-import { existsSync } from "node:fs";
 import { homedir } from "node:os";
-import { dirname, join } from "node:path";
+import { join } from "node:path";
+import type { JsonMap } from "@iarna/toml";
 import { stringify as stringifyToml } from "@iarna/toml";
 import type { McpServer } from "../config/schema.js";
 import { atomicWrite } from "../utils/atomic-write.js";
 import { backupConfig } from "../utils/backup.js";
-import type { Provider } from "./types.js";
-import { readTomlConfig, resolveConfigPath } from "./utils.js";
+import { BaseProvider } from "./base.js";
+import { resolveConfigPath } from "./utils.js";
 
-/**
- * Codex Provider
- * Config: ~/.codex/config.toml
- * Format: TOML with [mcp_servers.name] sections
- * http_headers for HTTP servers
- * enabled_tools support from overrides
- * Skills: ~/.codex/skills/
- */
-export class CodexProvider implements Provider {
+export class CodexProvider extends BaseProvider {
   name = "codex";
   configPath = (home: string) => join(home, ".codex", "config.toml");
   format = "toml" as const;
   mcpKey = "mcp_servers";
   skillsPath = (home: string) => join(home, ".codex", "skills");
 
-  async isInstalled(home?: string): Promise<boolean> {
-    const homeDir = home || homedir();
-    const configDir = dirname(resolveConfigPath(this.configPath, homeDir));
-    return existsSync(configDir);
-  }
-
-  async readConfig(home?: string): Promise<unknown> {
-    const homeDir = home || homedir();
-    const path = resolveConfigPath(this.configPath, homeDir);
-    return readTomlConfig(path);
-  }
-
-  async writeConfig(config: unknown, home?: string): Promise<void> {
+  override async writeConfig(config: unknown, home?: string): Promise<void> {
     const homeDir = home || homedir();
     const path = resolveConfigPath(this.configPath, homeDir);
 
     backupConfig(path);
 
-    const tomlContent = stringifyToml(config as any);
+    const tomlContent = stringifyToml(config as JsonMap);
     atomicWrite(path, tomlContent);
   }
 
@@ -79,7 +59,3 @@ export class CodexProvider implements Provider {
     return transformed;
   }
 }
-
-import { registry } from "./registry.js";
-
-registry.register(new CodexProvider());

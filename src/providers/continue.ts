@@ -1,39 +1,19 @@
-import { existsSync } from "node:fs";
 import { homedir } from "node:os";
-import { dirname, join } from "node:path";
+import { join } from "node:path";
 import { stringify as stringifyYaml } from "yaml";
 import type { McpServer } from "../config/schema.js";
 import { atomicWrite } from "../utils/atomic-write.js";
 import { backupConfig } from "../utils/backup.js";
-import type { Provider } from "./types.js";
-import { readYamlConfig, resolveConfigPath } from "./utils.js";
+import { BaseProvider } from "./base.js";
+import { resolveConfigPath } from "./utils.js";
 
-/**
- * Continue.dev Provider
- * Config: ~/.continue/config.yaml
- * Format: YAML with metadata header
- * Supports: SSE (url) and stdio servers
- * Transforms ${VAR} to ${{ secrets.VAR }}
- */
-export class ContinueProvider implements Provider {
+export class ContinueProvider extends BaseProvider {
   name = "continue";
   configPath = (home: string) => join(home, ".continue", "config.yaml");
   format = "yaml" as const;
   mcpKey = "mcpServers";
 
-  async isInstalled(home?: string): Promise<boolean> {
-    const homeDir = home || homedir();
-    const configDir = dirname(resolveConfigPath(this.configPath, homeDir));
-    return existsSync(configDir);
-  }
-
-  async readConfig(home?: string): Promise<unknown> {
-    const homeDir = home || homedir();
-    const path = resolveConfigPath(this.configPath, homeDir);
-    return readYamlConfig(path);
-  }
-
-  async writeConfig(config: unknown, home?: string): Promise<void> {
+  override async writeConfig(config: unknown, home?: string): Promise<void> {
     const homeDir = home || homedir();
     const path = resolveConfigPath(this.configPath, homeDir);
 
@@ -80,7 +60,3 @@ export class ContinueProvider implements Provider {
     return transformed;
   }
 }
-
-import { registry } from "./registry.js";
-
-registry.register(new ContinueProvider());

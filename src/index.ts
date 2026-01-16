@@ -2,10 +2,12 @@
 import { Command } from 'commander';
 import { init } from './commands/init';
 import { collect } from './commands/collect';
+import { validate } from './commands/validate';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { writeFile, readFile, exists } from 'node:fs/promises';
 import YAML from 'yaml';
+import chalk from 'chalk';
 
 const program = new Command();
 
@@ -59,6 +61,37 @@ program
       
       await writeFile(configPath, YAML.stringify(existingConfig), 'utf-8');
       console.log(`\n✓ Updated config: ${configPath}`);
+    } catch (error) {
+      console.error('Error:', error instanceof Error ? error.message : error);
+      process.exit(1);
+    }
+  });
+
+program
+  .command('validate')
+  .description('Validate TAAL configuration')
+  .action(async () => {
+    try {
+      const result = await validate();
+      
+      if (result.warnings.length > 0) {
+        console.log(chalk.yellow('\nWarnings:'));
+        for (const warning of result.warnings) {
+          console.log(chalk.yellow(`  ⚠ ${warning}`));
+        }
+      }
+      
+      if (result.valid) {
+        console.log(chalk.green('\n✓ Configuration is valid'));
+        process.exit(0);
+      } else {
+        console.log(chalk.red('\n✗ Configuration is invalid\n'));
+        console.log(chalk.red('Errors:'));
+        for (const error of result.errors) {
+          console.log(chalk.red(`  • ${error}`));
+        }
+        process.exit(1);
+      }
     } catch (error) {
       console.error('Error:', error instanceof Error ? error.message : error);
       process.exit(1);

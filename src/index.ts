@@ -6,6 +6,7 @@ import { validate } from './commands/validate';
 import { diff } from './commands/diff';
 import { sync } from './commands/sync';
 import { list } from './commands/list';
+import { providers } from './commands/providers';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { writeFile, readFile, exists } from 'node:fs/promises';
@@ -222,6 +223,43 @@ program
         for (const provider of result.enabledProviders) {
           console.log(`  • ${provider}`);
         }
+      }
+      
+      console.log();
+    } catch (error) {
+      console.error('Error:', error instanceof Error ? error.message : error);
+      process.exit(1);
+    }
+  });
+
+program
+  .command('providers')
+  .description('List all supported providers')
+  .action(async () => {
+    try {
+      const result = await providers();
+      
+      console.log(chalk.bold('\nSupported Providers:\n'));
+      
+      for (const provider of result.providers) {
+        const status = [];
+        
+        if (provider.installed) {
+          status.push(chalk.green('installed'));
+        } else {
+          status.push(chalk.dim('not installed'));
+        }
+        
+        if (provider.enabled) {
+          status.push(chalk.blue('enabled'));
+        } else {
+          status.push(chalk.dim('disabled'));
+        }
+        
+        const format = chalk.yellow(`[${provider.format}]`);
+        
+        console.log(`  ${chalk.bold(provider.name)} ${format} ${status.join(', ')}`);
+        console.log(chalk.dim(`    ${provider.configPath}`));
       }
       
       console.log();

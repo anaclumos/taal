@@ -4,6 +4,7 @@ import { init } from './commands/init';
 import { collect } from './commands/collect';
 import { validate } from './commands/validate';
 import { diff } from './commands/diff';
+import { sync } from './commands/sync';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { writeFile, readFile, exists } from 'node:fs/promises';
@@ -141,6 +142,40 @@ program
       }
       
       process.exit(1);
+    } catch (error) {
+      console.error('Error:', error instanceof Error ? error.message : error);
+      process.exit(1);
+    }
+  });
+
+program
+  .command('sync [provider]')
+  .description('Sync MCP configs and skills to providers')
+  .action(async (provider?: string) => {
+    try {
+      console.log(chalk.bold('Syncing...'));
+      const result = await sync(undefined, provider);
+      
+      if (result.error) {
+        console.error(chalk.red(`\nError: ${result.error}`));
+        process.exit(1);
+      }
+      
+      if (result.synced.length > 0) {
+        console.log(chalk.green(`\n✓ Synced to ${result.synced.length} provider(s):`));
+        for (const p of result.synced) {
+          console.log(chalk.green(`  • ${p}`));
+        }
+      }
+      
+      if (result.failed.length > 0) {
+        console.log(chalk.red(`\n✗ Failed to sync ${result.failed.length} provider(s):`));
+        for (const f of result.failed) {
+          console.log(chalk.red(`  • ${f.provider}: ${f.error}`));
+        }
+      }
+      
+      process.exit(result.success ? 0 : 1);
     } catch (error) {
       console.error('Error:', error instanceof Error ? error.message : error);
       process.exit(1);

@@ -1,12 +1,38 @@
 {
   "name": "taal",
   "version": "1.0.0",
+  "description": "CLI tool to sync MCP server configs and Agent Skills across AI coding assistants",
   "type": "module",
   "bin": {
     "taal": "./src/index.ts"
   },
   "scripts": {
     "test": "bun test"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "agent-skills",
+    "ai",
+    "claude",
+    "cursor",
+    "zed",
+    "cli",
+    "sync",
+    "config"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/user/taal.git"
+  },
+  "bugs": {
+    "url": "https://github.com/user/taal/issues"
+  },
+  "homepage": "https://github.com/user/taal#readme",
+  "engines": {
+    "node": ">=18.0.0"
   },
   "dependencies": {
     "commander": "^12.0.0",

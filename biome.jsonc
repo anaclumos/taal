@@ -11,7 +11,7 @@
         "noExplicitAny": "warn",
         "noEvolvingTypes": "warn",
         "noEmptyBlockStatements": "warn",
-        "noTemplateCurlyInString": "warn"
+        "noTemplateCurlyInString": "off"
       },
       "style": {
         "noNonNullAssertion": "off"

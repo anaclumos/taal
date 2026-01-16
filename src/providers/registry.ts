@@ -21,17 +21,19 @@ class ProviderRegistry {
   }
 
   /**
-   * Get all registered providers
+   * Get all registered providers (sorted by name for deterministic ordering)
    */
   getAll(): Provider[] {
-    return Array.from(this.providers.values());
+    return Array.from(this.providers.values()).sort((a, b) =>
+      a.name.localeCompare(b.name)
+    );
   }
 
   /**
-   * Get all provider names
+   * Get all provider names (sorted for deterministic ordering)
    */
   getNames(): string[] {
-    return Array.from(this.providers.keys());
+    return Array.from(this.providers.keys()).sort();
   }
 
   /**
@@ -42,7 +44,7 @@ class ProviderRegistry {
   }
 
   /**
-   * Get all installed providers
+   * Get all installed providers (sorted by name for deterministic ordering)
    */
   async getInstalled(): Promise<Provider[]> {
     const all = this.getAll();
@@ -54,7 +56,7 @@ class ProviderRegistry {
       }
     }
 
-    return installed;
+    return installed.sort((a, b) => a.name.localeCompare(b.name));
   }
 
   /**

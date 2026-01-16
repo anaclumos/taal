@@ -44,7 +44,7 @@ export function discoverSkills(paths: string[], baseDir?: string): Skill[] {
     }
 
     try {
-      const entries = readdirSync(basePath);
+      const entries = readdirSync(basePath).sort();
 
       for (const entry of entries) {
         const skillPath = join(basePath, entry);

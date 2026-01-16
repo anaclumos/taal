@@ -27,18 +27,18 @@ export interface Provider {
   /**
    * Check if provider is installed on this system
    */
-  isInstalled(): Promise<boolean>;
+  isInstalled(home?: string): Promise<boolean>;
   
   /**
    * Read provider's current config
    */
-  readConfig(): Promise<unknown>;
+  readConfig(home?: string): Promise<unknown>;
   
   /**
    * Write config to provider's config file
    * Should use atomic write and backup
    */
-  writeConfig(config: unknown): Promise<void>;
+  writeConfig(config: unknown, home?: string): Promise<void>;
   
   /**
    * Transform TAAL MCP servers to provider-specific format

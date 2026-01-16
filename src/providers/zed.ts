@@ -17,21 +17,21 @@ export class ZedProvider implements Provider {
   format = 'json' as const;
   mcpKey = 'context_servers';
   
-  async isInstalled(): Promise<boolean> {
-    const home = homedir();
-    const configDir = dirname(resolveConfigPath(this.configPath, home));
+  async isInstalled(home?: string): Promise<boolean> {
+    const homeDir = home || homedir();
+    const configDir = dirname(resolveConfigPath(this.configPath, homeDir));
     return existsSync(configDir);
   }
   
-  async readConfig(): Promise<unknown> {
-    const home = homedir();
-    const path = resolveConfigPath(this.configPath, home);
+  async readConfig(home?: string): Promise<unknown> {
+    const homeDir = home || homedir();
+    const path = resolveConfigPath(this.configPath, homeDir);
     return readJsonConfig(path);
   }
   
-  async writeConfig(config: unknown): Promise<void> {
-    const home = homedir();
-    const path = resolveConfigPath(this.configPath, home);
+  async writeConfig(config: unknown, home?: string): Promise<void> {
+    const homeDir = home || homedir();
+    const path = resolveConfigPath(this.configPath, homeDir);
     writeConfig(path, this.format, config);
   }
   
@@ -58,3 +58,6 @@ export class ZedProvider implements Provider {
     return transformed;
   }
 }
+
+import { registry } from './registry.js';
+registry.register(new ZedProvider());

@@ -123,3 +123,84 @@ taal.schema.json       # Generated JSON Schema
 - Task 2: Provider Abstraction Layer (depends on these types)
 - Consider adding schema version migration in future
 - May need to extend schema for provider-specific features
+
+---
+
+## [2026-01-17T01:15] Task 2: Provider Abstraction Layer
+
+### Successful Patterns
+
+1. **Atomic Write Implementation**
+   - Temp file + rename strategy ensures no partial writes
+   - Temp file in same directory as target (ensures same filesystem for atomic rename)
+   - Cleanup on error prevents orphaned temp files
+   - Pattern: write to `.{timestamp}.tmp` → rename to target
+
+2. **Backup Strategy**
+   - Timestamped backups in `~/.taal/backups/`
+   - ISO timestamp format with sanitized characters (replace `:` and `.` with `-`)
+   - Returns null if source doesn't exist (graceful handling)
+   - Preserves original file content exactly
+
+3. **Provider Interface Design**
+   - Clean separation: metadata vs behavior
+   - Support for both static paths and dynamic path functions
+   - Optional skills support (not all providers have skills)
+   - Async methods for I/O operations
+
+4. **Provider Registry Pattern**
+   - Singleton instance for global access
+   - Map-based storage for O(1) lookups
+   - Separate class export for testing
+   - `getInstalled()` filters by actual installation status
+
+5. **Config Format Utilities**
+   - Separate readers for JSON, YAML, TOML
+   - Return empty object if file doesn't exist (graceful defaults)
+   - Unified `readConfig()` dispatcher based on format
+   - Path resolver handles both string and function paths
+
+### Technical Decisions
+
+1. **Atomic Writes**: Prevents corruption during crashes/interruptions
+2. **Backup Before Write**: Safety net for user data
+3. **Registry Singleton**: Single source of truth for providers
+4. **Format-Specific Readers**: Type-safe parsing per format
+5. **Deferred YAML/TOML Writers**: JSON-only for now (will add when needed)
+
+### Gotchas Encountered
+
+1. **Bun.file() for Directories**: Initial test tried to read directory as file
+   - Error: "Directories cannot be read like files"
+   - Fix: Use `fs.readdirSync()` to check for temp files
+   - Lesson: Bun.file() is for files only, not directories
+
+2. **Temp File Naming**: Used timestamp to avoid collisions
+   - Pattern: `.{Date.now()}.tmp`
+   - Ensures uniqueness even with concurrent writes
+
+### Files Created
+```
+src/utils/
+├── atomic-write.ts    # Atomic file write utility
+└── backup.ts          # Config backup utility
+
+src/providers/
+├── types.ts           # Provider interface + types
+├── registry.ts        # Provider registry singleton
+└── utils.ts           # Config read/write utilities
+
+tests/providers/
+└── abstraction.test.ts # 22 tests for all utilities
+```
+
+### Metrics
+- **Lines of Code**: ~250 (src) + ~350 (tests)
+- **Test Coverage**: 22 tests, 31 assertions
+- **Test Execution Time**: ~64ms
+- **Type Errors**: 0
+
+### Next Steps
+- Task 3a-3h: Implement specific providers (Claude, Cursor, etc.)
+- Add YAML/TOML write support when needed
+- Consider adding retry logic for atomic writes

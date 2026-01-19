@@ -64,15 +64,15 @@ npm install -g @anaclumos/taal
 version: "1"
 
 mcp:
-  # TAAL MCP server
+  # TAAL MCP server (requires bun: https://bun.sh)
   taal:
-    command: npx
-    args: ["-y", "@anaclumos/taal", "taal-mcp"]
+    command: bunx
+    args: ["--bun", "taal-mcp"]
 
   # stdio server example
   filesystem:
-    command: npx
-    args: ["-y", "@modelcontextprotocol/server-filesystem", "/path"]
+    command: bunx
+    args: ["--bun", "@modelcontextprotocol/server-filesystem", "/path"]
     env:
       LOG_LEVEL: "info"
   
@@ -175,8 +175,8 @@ vim ~/.taal/config.yaml
 # 2. Add server configuration
 # mcp:
 #   new-server:
-#     command: npx
-#     args: ["-y", "package-name"]
+#     command: bunx
+#     args: ["--bun", "package-name"]
 
 # 3. Validate
 taal validate

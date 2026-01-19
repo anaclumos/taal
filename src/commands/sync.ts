@@ -70,10 +70,14 @@ export async function sync(
         const taalServers = config.mcp || {};
         const transformedServers = provider.transformMcpServers(taalServers);
 
-        const newConfig = {
+        let newConfig: Record<string, unknown> = {
           ...(currentConfig as object),
           [provider.mcpKey]: transformedServers,
         };
+
+        if (provider.transformConfig) {
+          newConfig = provider.transformConfig(newConfig, taalServers);
+        }
 
         await provider.writeConfig(newConfig, home);
 

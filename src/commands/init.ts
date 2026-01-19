@@ -4,19 +4,19 @@ import { join } from "node:path";
 import { collect } from "./collect.js";
 
 const SAMPLE_CONFIG = `# TAAL Configuration
-# https://github.com/user/taal
+# https://github.com/anaclumos/taal
 
 version: "1"
 
 mcp:
-  # TAAL MCP server
+  # TAAL MCP server (requires bun: https://bun.sh)
   taal:
-    command: npx
-    args: ["-y", "@anaclumos/taal", "taal-mcp"]
+    command: bunx
+    args: ["--bun", "taal-mcp"]
   # Example stdio server
   # example-server:
-  #   command: npx
-  #   args: ["-y", "@example/mcp-server"]
+  #   command: bunx
+  #   args: ["--bun", "@example/mcp-server"]
   #   env:
   #     API_KEY: "\${API_KEY}"
   

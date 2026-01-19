@@ -1,7 +1,9 @@
 #!/usr/bin/env bun
+import { readFileSync } from "node:fs";
 import { exists, readFile, writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { isError } from "es-toolkit/predicate";
@@ -15,6 +17,11 @@ import { providers } from "./commands/providers.js";
 import { sync } from "./commands/sync.js";
 import { validate } from "./commands/validate.js";
 import { McpServerSchema, TaalConfigSchema } from "./config/schema.js";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const packageJson = JSON.parse(
+  readFileSync(join(__dirname, "..", "package.json"), "utf-8")
+) as { version: string };
 
 function createToolResult(data: unknown) {
   return {
@@ -55,8 +62,8 @@ function createDefaultConfig(): RawTaalConfig {
     version: "1",
     mcp: {
       taal: {
-        command: "npx",
-        args: ["-y", "@anaclumos/taal", "taal-mcp"],
+        command: "bunx",
+        args: ["--bun", "taal-mcp"],
       },
     },
     skills: { paths: ["~/.taal/skills"] },
@@ -141,7 +148,7 @@ async function writeValidatedConfig(configPath: string, config: RawTaalConfig) {
 export function createTaalMcpServer() {
   const server = new McpServer({
     name: "taal",
-    version: "2.0.0",
+    version: packageJson.version,
   });
 
   const baseDirSchema = z

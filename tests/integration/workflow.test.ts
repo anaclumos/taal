@@ -78,8 +78,8 @@ test("full workflow: init → collect → validate → diff → sync", async () 
           args: ["server.js"],
         },
         taal: {
-          command: "npx",
-          args: ["-y", "@anaclumos/taal", "taal-mcp"],
+          command: "bunx",
+          args: ["--bun", "taal-mcp"],
         },
       },
     })

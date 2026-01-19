@@ -85,6 +85,15 @@ export interface Provider {
    * Optional: Transform skills to provider-specific format
    */
   transformSkills?(skills: unknown[]): unknown;
+
+  /**
+   * Optional: Apply additional transformations to the full config
+   * Called after mcpKey is set, allows providers to add extra keys
+   */
+  transformConfig?(
+    config: Record<string, unknown>,
+    servers: Record<string, McpServer>
+  ): Record<string, unknown>;
 }
 
 /**

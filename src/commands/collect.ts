@@ -182,8 +182,8 @@ export async function collectAndUpdateConfig(
     version: "1",
     mcp: {
       taal: {
-        command: "npx",
-        args: ["-y", "@anaclumos/taal", "taal-mcp"],
+        command: "bunx",
+        args: ["--bun", "taal-mcp"],
       },
     },
     skills: { paths: ["~/.taal/skills"] },

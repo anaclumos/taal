@@ -153,15 +153,15 @@ Shows for each provider:
 version: "1"
 
 mcp:
-  # TAAL MCP server
+  # TAAL MCP server (requires bun: https://bun.sh)
   taal:
-    command: npx
-    args: ["-y", "@anaclumos/taal", "taal-mcp"]
+    command: bunx
+    args: ["--bun", "taal-mcp"]
 
   # Stdio server example
   filesystem:
-    command: npx
-    args: ["-y", "@modelcontextprotocol/server-filesystem", "/path/to/allowed/files"]
+    command: bunx
+    args: ["--bun", "@modelcontextprotocol/server-filesystem", "/path/to/allowed/files"]
     env:
       LOG_LEVEL: "info"
   
@@ -215,13 +215,13 @@ mcp:
 
 ### TAAL MCP Server
 
-TAAL can run as an MCP server to expose its CLI features as tools.
+TAAL can run as an MCP server to expose its CLI features as tools. Requires [Bun](https://bun.sh).
 
 ```yaml
 mcp:
   taal:
-    command: npx
-    args: ["-y", "@anaclumos/taal", "taal-mcp"]
+    command: bunx
+    args: ["--bun", "taal-mcp"]
 ```
 
 Tools exposed:
@@ -527,7 +527,7 @@ taal/
 
 ## Publishing
 
-TAAL uses automated NPM publishing via GitHub Actions.
+TAAL uses automated NPM publishing via GitHub Actions, triggered by GitHub Releases.
 
 ### Release Process
 
@@ -545,11 +545,11 @@ TAAL uses automated NPM publishing via GitHub Actions.
    git push origin main
    ```
 
-3. **Create and push tag**:
-   ```bash
-   git tag v1.0.1
-   git push origin v1.0.1
-   ```
+3. **Create a GitHub Release**:
+   - Go to GitHub → Releases → "Create a new release"
+   - Create a new tag (e.g., `v1.0.1`)
+   - Add release notes
+   - Click "Publish release"
 
 4. **GitHub Actions automatically**:
    - Runs tests
@@ -559,7 +559,7 @@ TAAL uses automated NPM publishing via GitHub Actions.
 ### Prerequisites
 
 Repository maintainers must configure:
-- `NPM_TOKEN` secret in GitHub repository settings
+- NPM trusted publishing (OIDC) - no NPM_TOKEN needed
 - NPM account with 2FA enabled
 - Package access permissions
 

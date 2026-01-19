@@ -1,5 +1,8 @@
 #!/usr/bin/env bun
+import { readFileSync } from "node:fs";
 import { homedir } from "node:os";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import chalk from "chalk";
 import { Command } from "commander";
 import { isError } from "es-toolkit/predicate";
@@ -10,15 +13,23 @@ import { list } from "./commands/list";
 import { providers } from "./commands/providers";
 import { sync } from "./commands/sync";
 import { validate } from "./commands/validate";
+import { checkForUpdates } from "./utils/update-checker";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const packageJson = JSON.parse(
+  readFileSync(join(__dirname, "..", "package.json"), "utf-8")
+) as { version: string };
 
 const program = new Command();
+
+checkForUpdates().catch(() => undefined);
 
 program
   .name("taal")
   .description(
     "CLI to sync MCP server configs and Agent Skills across AI providers"
   )
-  .version("2.0.0");
+  .version(packageJson.version);
 
 program
   .command("init")

@@ -1,7 +1,6 @@
 import { join } from "node:path";
 import type { McpServer } from "../config/schema.js";
 import { BaseProvider } from "./base.js";
-import { readConfig, writeConfig as writeConfigUtil } from "./utils.js";
 
 export class ClaudeCodeProvider extends BaseProvider {
   name = "claude-code";
@@ -9,9 +8,6 @@ export class ClaudeCodeProvider extends BaseProvider {
   format = "json" as const;
   mcpKey = "mcpServers";
   skillsPath = (home: string) => join(home, ".claude", "skills");
-
-  private readonly cliConfigPath = (home: string) => join(home, ".claude.json");
-  private transformedServersCache: Record<string, unknown> = {};
 
   transformMcpServers(
     servers: Record<string, McpServer>
@@ -37,7 +33,6 @@ export class ClaudeCodeProvider extends BaseProvider {
       }
     }
 
-    this.transformedServersCache = transformed;
     return transformed;
   }
 
@@ -56,30 +51,5 @@ export class ClaudeCodeProvider extends BaseProvider {
       ...config,
       enabledMcpjsonServers: mergedEnabled,
     };
-  }
-
-  async writeConfig(config: unknown, home?: string): Promise<void> {
-    await super.writeConfig(config, home);
-
-    const homeDir = home || (await import("node:os")).homedir();
-    const cliPath = this.cliConfigPath(homeDir);
-    const cliConfig = (await readConfig(cliPath, "json")) as Record<
-      string,
-      unknown
-    >;
-
-    const existingCliServers =
-      (cliConfig.mcpServers as Record<string, unknown>) || {};
-    const mergedCliServers = {
-      ...existingCliServers,
-      ...this.transformedServersCache,
-    };
-
-    const newCliConfig = {
-      ...cliConfig,
-      mcpServers: mergedCliServers,
-    };
-
-    writeConfigUtil(cliPath, "json", newCliConfig);
   }
 }

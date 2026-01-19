@@ -8,7 +8,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { isError } from "es-toolkit/predicate";
 import YAML from "yaml";
-import { z } from "zod/v4";
+import { z } from "zod";
 import { collectAndUpdateConfig } from "./commands/collect.js";
 import { diff } from "./commands/diff.js";
 import { init } from "./commands/init.js";
@@ -205,10 +205,10 @@ export function createTaalMcpServer() {
     "taal_init",
     {
       description: "Initialize TAAL configuration and collect existing MCPs.",
-      inputSchema: {
+      inputSchema: z.object({
         baseDir: baseDirSchema,
         force: forceSchema,
-      },
+      }),
     },
     async ({ baseDir, force }) => {
       try {
@@ -224,10 +224,10 @@ export function createTaalMcpServer() {
     "taal_config_read",
     {
       description: "Read TAAL config.yaml (parsed and optionally raw).",
-      inputSchema: {
+      inputSchema: z.object({
         baseDir: baseDirSchema,
         includeRaw: includeRawSchema,
-      },
+      }),
     },
     async ({ baseDir, includeRaw }) => {
       try {
@@ -256,9 +256,9 @@ export function createTaalMcpServer() {
     {
       description:
         "Collect MCP servers from installed providers and merge into config.",
-      inputSchema: {
+      inputSchema: z.object({
         baseDir: baseDirSchema,
-      },
+      }),
     },
     async ({ baseDir }) => {
       try {
@@ -274,13 +274,13 @@ export function createTaalMcpServer() {
     "taal_mcp_add",
     {
       description: "Add or update an MCP server entry in config.yaml.",
-      inputSchema: {
+      inputSchema: z.object({
         baseDir: baseDirSchema,
         createIfMissing: createIfMissingSchema,
         overwrite: overwriteSchema,
         name: mcpNameSchema,
         server: z.object(mcpServerInputSchema),
-      },
+      }),
     },
     async ({
       baseDir,
@@ -331,11 +331,11 @@ export function createTaalMcpServer() {
     "taal_mcp_delete",
     {
       description: "Delete an MCP server entry from config.yaml.",
-      inputSchema: {
+      inputSchema: z.object({
         baseDir: baseDirSchema,
         errorIfMissing: errorIfMissingSchema,
         name: mcpNameSchema,
-      },
+      }),
     },
     async ({ baseDir, errorIfMissing, name }) => {
       try {
@@ -378,11 +378,11 @@ export function createTaalMcpServer() {
     "taal_skill_path_add",
     {
       description: "Add a skills path to config.yaml.",
-      inputSchema: {
+      inputSchema: z.object({
         baseDir: baseDirSchema,
         createIfMissing: createIfMissingSchema,
         path: skillPathSchema,
-      },
+      }),
     },
     async ({ baseDir, createIfMissing, path }) => {
       try {
@@ -424,11 +424,11 @@ export function createTaalMcpServer() {
     "taal_skill_path_delete",
     {
       description: "Remove a skills path from config.yaml.",
-      inputSchema: {
+      inputSchema: z.object({
         baseDir: baseDirSchema,
         errorIfMissing: errorIfMissingSchema,
         path: skillPathSchema,
-      },
+      }),
     },
     async ({ baseDir, errorIfMissing, path }) => {
       try {
@@ -476,9 +476,9 @@ export function createTaalMcpServer() {
     "taal_validate",
     {
       description: "Validate TAAL configuration.",
-      inputSchema: {
+      inputSchema: z.object({
         baseDir: baseDirSchema,
-      },
+      }),
     },
     async ({ baseDir }) => {
       try {
@@ -494,10 +494,10 @@ export function createTaalMcpServer() {
     "taal_diff",
     {
       description: "Show pending MCP changes without writing.",
-      inputSchema: {
+      inputSchema: z.object({
         baseDir: baseDirSchema,
         provider: providerSchema,
-      },
+      }),
     },
     async ({ baseDir, provider }) => {
       try {
@@ -513,10 +513,10 @@ export function createTaalMcpServer() {
     "taal_sync",
     {
       description: "Sync MCP configs and skills to enabled providers.",
-      inputSchema: {
+      inputSchema: z.object({
         baseDir: baseDirSchema,
         provider: providerSchema,
-      },
+      }),
     },
     async ({ baseDir, provider }) => {
       try {
@@ -532,9 +532,9 @@ export function createTaalMcpServer() {
     "taal_list",
     {
       description: "List configured MCP servers, skills, and providers.",
-      inputSchema: {
+      inputSchema: z.object({
         baseDir: baseDirSchema,
-      },
+      }),
     },
     async ({ baseDir }) => {
       try {
@@ -550,9 +550,9 @@ export function createTaalMcpServer() {
     "taal_providers",
     {
       description: "List supported providers and their status.",
-      inputSchema: {
+      inputSchema: z.object({
         baseDir: baseDirSchema,
-      },
+      }),
     },
     async ({ baseDir }) => {
       try {

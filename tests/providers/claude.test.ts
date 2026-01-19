@@ -327,7 +327,7 @@ describe("ClaudeCodeProvider", () => {
     const configDir = join(testHome, ".claude");
     mkdirSync(configDir, { recursive: true });
 
-    const configPath = join(configDir, "settings.json");
+    const primaryPath = join(configDir, "settings.json");
     const configData = {
       mcpServers: {
         "test-server": {
@@ -336,10 +336,9 @@ describe("ClaudeCodeProvider", () => {
         },
       },
     };
-    writeFileSync(configPath, JSON.stringify(configData, null, 2));
+    writeFileSync(primaryPath, JSON.stringify(configData, null, 2));
 
-    provider.configPath = configPath;
-    const config = await provider.readConfig();
+    const config = await provider.readConfig(testHome);
 
     expect(config).toEqual(configData);
   });
@@ -349,8 +348,7 @@ describe("ClaudeCodeProvider", () => {
     const configDir = join(testHome, ".claude");
     mkdirSync(configDir, { recursive: true });
 
-    const configPath = join(configDir, "settings.json");
-    provider.configPath = configPath;
+    const primaryPath = join(configDir, "settings.json");
 
     const configData = {
       mcpServers: {
@@ -361,10 +359,99 @@ describe("ClaudeCodeProvider", () => {
       },
     };
 
-    await provider.writeConfig(configData);
+    await provider.writeConfig(configData, testHome);
 
-    expect(existsSync(configPath)).toBe(true);
-    const written = JSON.parse(readFileSync(configPath, "utf-8"));
+    expect(existsSync(primaryPath)).toBe(true);
+    const written = JSON.parse(readFileSync(primaryPath, "utf-8"));
     expect(written).toEqual(configData);
+  });
+
+  it("should write config to both primary and secondary paths", async () => {
+    const testHome = TEST_DIR;
+    const configDir = join(testHome, ".claude");
+    mkdirSync(configDir, { recursive: true });
+
+    const primaryPath = join(configDir, "settings.json");
+    const secondaryPath = join(testHome, ".claude.json");
+
+    writeFileSync(secondaryPath, JSON.stringify({ existingKey: "value" }));
+
+    const configData = {
+      mcpServers: {
+        "test-server": {
+          type: "stdio",
+          command: "npx",
+          args: ["-y", "package"],
+        },
+      },
+      enabledMcpjsonServers: ["test-server"],
+    };
+
+    await provider.writeConfig(configData, testHome);
+
+    expect(existsSync(primaryPath)).toBe(true);
+    expect(existsSync(secondaryPath)).toBe(true);
+
+    const primaryWritten = JSON.parse(readFileSync(primaryPath, "utf-8"));
+    expect(primaryWritten).toEqual(configData);
+
+    const secondaryWritten = JSON.parse(readFileSync(secondaryPath, "utf-8"));
+    expect(secondaryWritten.mcpServers).toEqual(configData.mcpServers);
+    expect(secondaryWritten.existingKey).toBe("value");
+  });
+
+  it("should read and merge config from both paths", async () => {
+    const testHome = TEST_DIR;
+    const configDir = join(testHome, ".claude");
+    mkdirSync(configDir, { recursive: true });
+
+    const primaryPath = join(configDir, "settings.json");
+    const secondaryPath = join(testHome, ".claude.json");
+
+    writeFileSync(
+      primaryPath,
+      JSON.stringify({
+        mcpServers: {
+          "primary-server": { type: "stdio", command: "npx" },
+        },
+        enabledMcpjsonServers: ["primary-server"],
+      })
+    );
+
+    writeFileSync(
+      secondaryPath,
+      JSON.stringify({
+        mcpServers: {
+          "secondary-server": { type: "stdio", command: "node" },
+        },
+        otherKey: "value",
+      })
+    );
+
+    const config = (await provider.readConfig(testHome)) as Record<
+      string,
+      unknown
+    >;
+
+    expect(config.mcpServers).toEqual({
+      "secondary-server": { type: "stdio", command: "node" },
+      "primary-server": { type: "stdio", command: "npx" },
+    });
+    expect(config.enabledMcpjsonServers).toEqual(["primary-server"]);
+  });
+
+  it("should detect installation from either config location", async () => {
+    const testHome = TEST_DIR;
+
+    expect(await provider.isInstalled(testHome)).toBe(false);
+
+    const secondaryPath = join(testHome, ".claude.json");
+    writeFileSync(secondaryPath, "{}");
+    expect(await provider.isInstalled(testHome)).toBe(true);
+
+    rmSync(secondaryPath);
+    const configDir = join(testHome, ".claude");
+    mkdirSync(configDir, { recursive: true });
+    expect(await provider.isInstalled(testHome)).toBe(true);
   });
 });

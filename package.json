@@ -1,6 +1,6 @@
 {
   "name": "@anaclumos/taal",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "CLI tool to sync MCP server configs and Agent Skills across AI coding assistants",
   "type": "module",
   "bin": {

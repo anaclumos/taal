@@ -8,7 +8,11 @@ const SAMPLE_CONFIG = `# TAAL Configuration
 
 version: "1"
 
-mcp: {}
+mcp:
+  # TAAL MCP server
+  taal:
+    command: npx
+    args: ["-y", "@anaclumos/taal", "taal-mcp"]
   # Example stdio server
   # example-server:
   #   command: npx

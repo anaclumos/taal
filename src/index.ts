@@ -1,12 +1,9 @@
 #!/usr/bin/env bun
-import { exists, readFile, writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
-import { join } from "node:path";
 import chalk from "chalk";
 import { Command } from "commander";
 import { isError } from "es-toolkit/predicate";
-import YAML from "yaml";
-import { collect } from "./commands/collect";
+import { collectAndUpdateConfig } from "./commands/collect";
 import { diff } from "./commands/diff";
 import { init } from "./commands/init";
 import { list } from "./commands/list";
@@ -21,7 +18,7 @@ program
   .description(
     "CLI to sync MCP server configs and Agent Skills across AI providers"
   )
-  .version("1.0.0");
+  .version("2.0.0");
 
 program
   .command("init")
@@ -58,7 +55,7 @@ program
   .action(async () => {
     try {
       console.log("Scanning installed providers...");
-      const result = await collect();
+      const result = await collectAndUpdateConfig();
 
       console.log(
         `\n✓ Found ${result.summary.totalServers} server(s) from ${result.summary.providersWithConfigs} provider(s)`
@@ -77,30 +74,7 @@ program
         }
       }
 
-      const configPath = join(homedir(), ".taal", "config.yaml");
-      interface TaalConfigFile {
-        version: string;
-        mcp: Record<string, unknown>;
-        skills?: { paths: string[] };
-        providers?: { enabled: string[] };
-      }
-
-      let existingConfig: TaalConfigFile = {
-        version: "1",
-        mcp: {},
-        skills: { paths: ["~/.taal/skills"] },
-        providers: { enabled: [] },
-      };
-
-      if (await exists(configPath)) {
-        const content = await readFile(configPath, "utf-8");
-        existingConfig = YAML.parse(content) as TaalConfigFile;
-      }
-
-      existingConfig.mcp = { ...existingConfig.mcp, ...result.servers };
-
-      await writeFile(configPath, YAML.stringify(existingConfig), "utf-8");
-      console.log(`\n✓ Updated config: ${configPath}`);
+      console.log(`\n✓ Updated config: ${result.configPath}`);
     } catch (error) {
       console.error("Error:", isError(error) ? error.message : error);
       process.exit(1);

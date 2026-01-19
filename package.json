@@ -1,10 +1,11 @@
 {
   "name": "@anaclumos/taal",
-  "version": "1.1.9",
+  "version": "2.0.0",
   "description": "CLI tool to sync MCP server configs and Agent Skills across AI coding assistants",
   "type": "module",
   "bin": {
-    "taal": "./src/index.ts"
+    "taal": "./src/index.ts",
+    "taal-mcp": "./src/mcp.ts"
   },
   "scripts": {
     "test": "bun test",
@@ -37,6 +38,7 @@
   },
   "dependencies": {
     "@iarna/toml": "^2.2.5",
+    "@modelcontextprotocol/sdk": "^1.25.2",
     "chalk": "^5.3.0",
     "commander": "^12.0.0",
     "es-toolkit": "^1.44.0",

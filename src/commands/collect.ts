@@ -1,7 +1,9 @@
 import { existsSync } from "node:fs";
+import { exists, readFile, writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { isEqual, isPlainObject, isString, uniqWith } from "es-toolkit";
+import YAML from "yaml";
 import type { McpServer } from "../config/schema.js";
 import { initializeProviders, registry } from "../providers/index.js";
 import { copySkillsToProvider } from "../skills/copy.js";
@@ -22,6 +24,10 @@ export interface CollectResult {
     providersScanned: number;
     providersWithConfigs: number;
   };
+}
+
+export interface CollectAndUpdateConfigResult extends CollectResult {
+  configPath: string;
 }
 
 /**
@@ -155,6 +161,47 @@ export async function collect(baseDir?: string): Promise<CollectResult> {
       providersScanned,
       providersWithConfigs,
     },
+  };
+}
+
+export async function collectAndUpdateConfig(
+  baseDir?: string
+): Promise<CollectAndUpdateConfigResult> {
+  const result = await collect(baseDir);
+  const home = baseDir || homedir();
+  const configPath = join(home, ".taal", "config.yaml");
+
+  interface TaalConfigFile {
+    version: string;
+    mcp: Record<string, unknown>;
+    skills?: { paths: string[] };
+    providers?: { enabled: string[] };
+  }
+
+  let existingConfig: TaalConfigFile = {
+    version: "1",
+    mcp: {
+      taal: {
+        command: "npx",
+        args: ["-y", "@anaclumos/taal", "taal-mcp"],
+      },
+    },
+    skills: { paths: ["~/.taal/skills"] },
+    providers: { enabled: [] },
+  };
+
+  if (await exists(configPath)) {
+    const content = await readFile(configPath, "utf-8");
+    existingConfig = YAML.parse(content) as TaalConfigFile;
+  }
+
+  existingConfig.mcp = { ...existingConfig.mcp, ...result.servers };
+
+  await writeFile(configPath, YAML.stringify(existingConfig), "utf-8");
+
+  return {
+    ...result,
+    configPath,
   };
 }
 

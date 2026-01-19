@@ -2,6 +2,7 @@ import { afterEach, beforeEach, expect, test } from "bun:test";
 import { exists, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import YAML from "yaml";
 import { collect } from "../../src/commands/collect";
 import { diff } from "../../src/commands/diff";
 import { init } from "../../src/commands/init";
@@ -76,6 +77,10 @@ test("full workflow: init → collect → validate → diff → sync", async () 
           command: "node",
           args: ["server.js"],
         },
+        taal: {
+          command: "npx",
+          args: ["-y", "@anaclumos/taal", "taal-mcp"],
+        },
       },
     })
   );
@@ -85,14 +90,15 @@ test("full workflow: init → collect → validate → diff → sync", async () 
 
   const configPath = join(testDir, ".taal", "config.yaml");
   let config = await readFile(configPath, "utf-8");
-  config = config.replace(
-    "mcp: {}",
-    `mcp:
-  existing-server:
-    command: node
-    args: ["server.js"]`
-  );
-  await writeFile(configPath, config);
+  const parsedConfig = YAML.parse(config) as Record<string, unknown>;
+  const mcpSection =
+    (parsedConfig.mcp as Record<string, unknown> | undefined) || {};
+  mcpSection["existing-server"] = {
+    command: "node",
+    args: ["server.js"],
+  };
+  parsedConfig.mcp = mcpSection;
+  await writeFile(configPath, YAML.stringify(parsedConfig));
 
   const validateResult = await validate(testDir);
   expect(validateResult.valid).toBe(true);
@@ -101,15 +107,16 @@ test("full workflow: init → collect → validate → diff → sync", async () 
   expect(diffResult.hasChanges).toBe(false);
 
   config = await readFile(configPath, "utf-8");
-  const updatedConfig = config.replace(
-    "existing-server:",
-    `existing-server:
-    command: node
-    args: ["server.js"]
-  new-server:`
-  );
+  const updatedParsedConfig = YAML.parse(config) as Record<string, unknown>;
+  const updatedMcpSection =
+    (updatedParsedConfig.mcp as Record<string, unknown> | undefined) || {};
+  updatedMcpSection["new-server"] = {
+    command: "node",
+    args: ["new-server.js"],
+  };
+  updatedParsedConfig.mcp = updatedMcpSection;
 
-  await writeFile(configPath, updatedConfig);
+  await writeFile(configPath, YAML.stringify(updatedParsedConfig));
 
   const diffResult2 = await diff(testDir);
   expect(diffResult2.hasChanges).toBe(true);

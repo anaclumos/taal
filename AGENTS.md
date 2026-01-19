@@ -64,6 +64,11 @@ npm install -g @anaclumos/taal
 version: "1"
 
 mcp:
+  # TAAL MCP server
+  taal:
+    command: npx
+    args: ["-y", "@anaclumos/taal", "taal-mcp"]
+
   # stdio server example
   filesystem:
     command: npx

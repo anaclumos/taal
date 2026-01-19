@@ -153,6 +153,11 @@ Shows for each provider:
 version: "1"
 
 mcp:
+  # TAAL MCP server
+  taal:
+    command: npx
+    args: ["-y", "@anaclumos/taal", "taal-mcp"]
+
   # Stdio server example
   filesystem:
     command: npx
@@ -207,6 +212,31 @@ mcp:
         enabled_tools: ["tool1", "tool2"]
         startup_timeout_sec: 60
 ```
+
+### TAAL MCP Server
+
+TAAL can run as an MCP server to expose its CLI features as tools.
+
+```yaml
+mcp:
+  taal:
+    command: npx
+    args: ["-y", "@anaclumos/taal", "taal-mcp"]
+```
+
+Tools exposed:
+- `taal_init`
+- `taal_config_read`
+- `taal_collect` (collects and writes to `~/.taal/config.yaml`)
+- `taal_mcp_add`
+- `taal_mcp_delete`
+- `taal_skill_path_add`
+- `taal_skill_path_delete`
+- `taal_validate`
+- `taal_diff`
+- `taal_sync`
+- `taal_list`
+- `taal_providers`
 
 ## Supported Providers
 

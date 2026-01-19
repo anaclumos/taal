@@ -236,7 +236,7 @@ describe("ProviderRegistry", () => {
       mcpKey: "mcpServers",
       isInstalled: async () => true,
       readConfig: async () => ({}),
-      writeConfig: async () => {},
+      writeConfig: async () => undefined,
       transformMcpServers: () => ({}),
     };
 
@@ -254,7 +254,7 @@ describe("ProviderRegistry", () => {
       mcpKey: "mcpServers",
       isInstalled: async () => true,
       readConfig: async () => ({}),
-      writeConfig: async () => {},
+      writeConfig: async () => undefined,
       transformMcpServers: () => ({}),
     };
 
@@ -265,7 +265,7 @@ describe("ProviderRegistry", () => {
       mcpKey: "context_servers",
       isInstalled: async () => true,
       readConfig: async () => ({}),
-      writeConfig: async () => {},
+      writeConfig: async () => undefined,
       transformMcpServers: () => ({}),
     };
 
@@ -286,7 +286,7 @@ describe("ProviderRegistry", () => {
       mcpKey: "mcpServers",
       isInstalled: async () => true,
       readConfig: async () => ({}),
-      writeConfig: async () => {},
+      writeConfig: async () => undefined,
       transformMcpServers: () => ({}),
     };
 
@@ -297,7 +297,7 @@ describe("ProviderRegistry", () => {
       mcpKey: "context_servers",
       isInstalled: async () => true,
       readConfig: async () => ({}),
-      writeConfig: async () => {},
+      writeConfig: async () => undefined,
       transformMcpServers: () => ({}),
     };
 
@@ -316,7 +316,7 @@ describe("ProviderRegistry", () => {
       mcpKey: "mcpServers",
       isInstalled: async () => true,
       readConfig: async () => ({}),
-      writeConfig: async () => {},
+      writeConfig: async () => undefined,
       transformMcpServers: () => ({}),
     };
 
@@ -327,7 +327,7 @@ describe("ProviderRegistry", () => {
       mcpKey: "mcpServers",
       isInstalled: async () => false,
       readConfig: async () => ({}),
-      writeConfig: async () => {},
+      writeConfig: async () => undefined,
       transformMcpServers: () => ({}),
     };
 
@@ -347,7 +347,7 @@ describe("ProviderRegistry", () => {
       mcpKey: "mcpServers",
       isInstalled: async () => true,
       readConfig: async () => ({}),
-      writeConfig: async () => {},
+      writeConfig: async () => undefined,
       transformMcpServers: () => ({}),
     };
 
